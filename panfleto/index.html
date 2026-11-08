@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Panfleto — Balcão Pizza Napoletana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style id="page-size">@page{size:148mm 210mm;margin:0}</style>
+<style>
+/* Panfleto A5 (148 × 210 mm). Abra com ?a4 para 2 panfletos numa folha A4 deitada (imprimir e cortar ao meio). */
+:root{--wine:#6C1603;--wine-ink:#3E0F06;--cream:#FBF6EE;--paper:#F4ECDF;--line:#E3D5C3;--ink:#231A15;--muted:#6F625A;--gold:#E7B26C;--wa:#1FA855}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#d9d2c8}
+body{font-family:"DM Sans",system-ui,sans-serif;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.serif{font-family:"Cormorant Garamond",Georgia,serif}
+.sheets{display:flex;gap:0;justify-content:center;padding:20px 0}
+@media print{html,body{background:none}.sheets{padding:0}}
+.sheet{width:148mm;height:210mm;background:var(--cream);position:relative;overflow:hidden;display:flex;flex-direction:column}
+@media screen{.sheet{box-shadow:0 10px 40px rgba(0,0,0,.25);margin:0 10px}}
+
+/* topo */
+.top{background:var(--wine);color:#F6E9DA;padding:7.5mm 9mm 0;height:74mm;position:relative}
+.logo{text-align:center;line-height:1}
+.logo b{display:block;font:600 30pt/0.9 "Cormorant Garamond",serif;letter-spacing:.06em;color:#F3E6D6}
+.logo small{display:block;font:500 7pt "Cormorant Garamond",serif;letter-spacing:.42em;margin-top:2.2mm;color:#E8D5C2}
+.hello{text-align:center;margin-top:4mm}
+.hello .k{font-size:7.5pt;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.hello h1{font:600 19pt/1.02 "Cormorant Garamond",serif;margin-top:1.5mm;color:#fff}
+.hello h1 em{font-style:italic;color:var(--gold)}
+.pies{position:absolute;left:0;right:0;bottom:-15mm;display:flex;justify-content:center;gap:4mm;z-index:2}
+.pies img{width:31mm;height:31mm;border-radius:50%;object-fit:cover;border:1.6mm solid #fff;box-shadow:0 2mm 4mm rgba(62,15,6,.3)}
+.pies img:nth-child(2){width:36mm;height:36mm;margin-top:-3mm}
+
+/* corpo */
+.body{padding:19mm 9mm 0;flex:1;display:flex;flex-direction:column}
+.pitch{text-align:center;font-size:8.6pt;line-height:1.45;color:var(--muted);margin:0 2mm}
+.pitch b{color:var(--wine-ink)}
+.menu{margin-top:4.5mm;border-top:.3mm solid var(--line);border-bottom:.3mm solid var(--line);padding:2.6mm 0}
+.menu h2{font:600 13pt "Cormorant Garamond",serif;color:var(--wine-ink);display:flex;justify-content:space-between;align-items:baseline}
+.menu h2 span{font:500 6.8pt "DM Sans";color:var(--muted);letter-spacing:.04em}
+.row{display:flex;align-items:baseline;gap:2mm;margin-top:1.55mm}
+.row .n{font:600 11pt "Cormorant Garamond",serif;color:var(--wine-ink);white-space:nowrap}
+.row .d{font-size:6.4pt;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto;min-width:0}
+.row .dots{flex:1 1 4mm;border-bottom:.35mm dotted #BBA995;transform:translateY(-1mm);min-width:4mm}
+.row .p{font-weight:700;font-size:8.6pt;font-variant-numeric:tabular-nums;white-space:nowrap}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:2.5mm;margin-top:4mm}
+.how div{background:var(--paper);border-radius:2.5mm;padding:2.2mm 2.4mm}
+.how b{display:block;font:700 11pt/1 "Cormorant Garamond",serif;color:var(--wine)}
+.how span{display:block;font-size:6.6pt;line-height:1.3;color:var(--ink);margin-top:.8mm}
+
+/* rodapé */
+.foot{margin-top:auto;display:grid;grid-template-columns:24mm 1fr 24mm;gap:3.5mm;align-items:center;padding:3mm 9mm 6mm}
+.qr{text-align:center}
+.qr img{width:24mm;height:24mm;display:block;background:#fff;padding:1.4mm;border-radius:1.5mm;outline:.3mm solid var(--line)}
+.qr span{display:block;font-size:5.8pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:1mm;color:var(--wine)}
+.info{text-align:center;font-size:7pt;line-height:1.45;color:var(--ink)}
+.info .wa{display:inline-flex;align-items:center;gap:1.2mm;background:var(--wa);color:#fff;font-weight:700;font-size:9.4pt;padding:1.2mm 3mm;border-radius:10mm;margin-bottom:1.6mm;font-variant-numeric:tabular-nums}
+.info .wa svg{width:3.6mm;height:3.6mm}
+.info .addr{font-weight:700}
+.info .muted{color:var(--muted)}
+.cut{display:none}
+</style>
+</head>
+<body>
+<div class="sheets" id="sheets">
+<section class="sheet">
+  <header class="top">
+    <div class="logo"><b>BALCÃO</b><small>PIZZA NAPOLETANA</small></div>
+    <div class="hello">
+      <div class="k">Oi, vizinho!</div>
+      <h1>Pizza napoletana<br>aqui do lado — <em>é só retirar.</em></h1>
+    </div>
+    <div class="pies">
+      <img src="../img/calabresa.jpg" alt="">
+      <img src="../img/margherita.jpg" alt="">
+      <img src="../img/gorgonzola.jpg" alt="">
+    </div>
+  </header>
+
+  <main class="body">
+    <p class="pitch">Feita à mão, uma a uma, com <b>48 horas de fermentação lenta</b> e farinha italiana tipo 00. Peça direto com a gente pelo <b>WhatsApp</b> e retire no nosso <b>balcão</b> — sem app no meio.</p>
+
+    <div class="menu">
+      <h2>Cardápio <span>30 cm · 6 pedaços</span></h2>
+      <div class="row"><span class="n">Mussarela</span><span class="d">molho artesanal, orégano, azeite</span><span class="dots"></span><span class="p">R$ 44,90</span></div>
+      <div class="row"><span class="n">Calabresa com Cebola</span><span class="d">calabresa defumada, cebola roxa</span><span class="dots"></span><span class="p">R$ 44,90</span></div>
+      <div class="row"><span class="n">Três Queijos</span><span class="d">mussarela, gorgonzola, parmesão</span><span class="dots"></span><span class="p">R$ 44,90</span></div>
+      <div class="row"><span class="n">Margherita</span><span class="d">Fior di Latte, manjericão</span><span class="dots"></span><span class="p">R$ 47,90</span></div>
+      <div class="row"><span class="n">Diavola</span><span class="d">pepperoni picante, Fior di Latte</span><span class="dots"></span><span class="p">R$ 49,90</span></div>
+      <div class="row"><span class="n">Gorgonzola &amp; Cogumelo</span><span class="d">cogumelo Paris, gorgonzola</span><span class="dots"></span><span class="p">R$ 49,90</span></div>
+    </div>
+
+    <div class="how">
+      <div><b>1. Escolha</b><span>no site ou direto no WhatsApp</span></div>
+      <div><b>2. Envie</b><span>com o horário que quer retirar</span></div>
+      <div><b>3. Retire</b><span>no balcão, quentinha — paga na hora</span></div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="qr"><img src="qr-site.svg" alt="QR code do cardápio"><span>Cardápio e pedido</span></div>
+    <div class="info">
+      <div class="wa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm4.5 12.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.3-.4.8-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3Z"/></svg>(41) 99213-2280</div>
+      <div class="addr">Alameda Augusto Stellfeld, 1277</div>
+      <div class="muted">Curitiba · Terça a domingo · 18h às 23h</div>
+      <div class="muted">@balcaopizzanapoletana</div>
+    </div>
+    <div class="qr"><img src="qr-whats.svg" alt="QR code do WhatsApp"><span>Chamar no Whats</span></div>
+  </footer>
+</section>
+</div>
+<script>
+// #a4 → dois panfletos lado a lado numa A4 deitada, para imprimir em casa e cortar ao meio
+if (new URLSearchParams(location.search).has("a4")) {
+  document.getElementById("page-size").textContent = "@page{size:297mm 210mm;margin:0}";
+  const s = document.querySelector(".sheet");
+  s.parentNode.appendChild(s.cloneNode(true));
+  document.getElementById("sheets").style.gap = "0";
+  const st = document.createElement("style");
+  st.textContent = "@media print{.sheet{margin:0}.sheet+.sheet{border-left:.2mm dashed #bbb}}";
+  document.head.appendChild(st);
+}
+</script>
+</body>
+</html>
