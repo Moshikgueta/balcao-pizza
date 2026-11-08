@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Balcão Pizza Napoletana — Pizza feita à mão, uma a uma</title>
-<meta name="description" content="Pizza napoletana feita à mão, uma a uma. Veja o cardápio e faça seu pedido pelo WhatsApp.">
+<meta name="description" content="Pizza napoletana feita à mão, uma a uma. Peça pelo WhatsApp e retire no balcão — direto com a pizzaria do bairro.">
 <meta name="theme-color" content="#6A1B0D">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -184,6 +184,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
 .total b{font-size:20px}
 .dfoot .btn{width:100%}
 .hint{font-size:12.5px;color:var(--muted);text-align:center;margin:10px 0 0}
+.pickup{display:grid;gap:2px;background:#fff;border:1.5px dashed var(--wine-2);border-radius:12px;padding:12px 14px;font-size:14.5px;color:var(--muted)}
+.pickup b{color:var(--wine);font-size:15.5px}
 .err{color:#9E2B1E;font-size:13.5px;margin:0;min-height:1em}
 </style>
 </head>
@@ -195,7 +197,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
     <nav aria-label="Seções">
       <a href="#cardapio">Cardápio</a>
       <a href="#nossa-forma">Nossa forma</a>
-      <a href="#como-pedir">Como pedir</a>
+      <a href="#como-pedir">Retirada</a>
       <a href="#contato">Contato</a>
     </nav>
     <button class="btn btn-wine cart-btn" type="button" data-open-cart aria-label="Abrir pedido">
@@ -209,9 +211,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
   <div class="hero">
     <div class="wrap hero-grid">
       <div>
-        <span class="kicker">Pizzaria napoletana</span>
+        <span class="kicker">Pizzaria napoletana do bairro</span>
         <h1>Feita à mão,<br><em>uma a uma.</em></h1>
-        <p class="lead">Massa de longa fermentação, molho de tomate artesanal e forno bem quente. Escolha sua pizza aqui e mande o pedido direto no nosso WhatsApp.</p>
+        <p class="lead">Massa de longa fermentação, molho de tomate artesanal e forno bem quente. Escolha aqui, mande o pedido no WhatsApp e <strong style="color:var(--ink)">retire no balcão</strong> — direto com a gente, sem app no meio.</p>
         <div class="cta">
           <a class="btn btn-wine" href="#cardapio">Ver cardápio</a>
           <a class="btn btn-wa" data-wa-link href="#" target="_blank" rel="noopener">
@@ -222,7 +224,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
         <div class="facts">
           <span><span class="star" aria-hidden="true">★</span><strong>5,0</strong> · 16 avaliações</span>
           <span>🍕 <strong>30 cm</strong> · 6 pedaços</span>
-          <span>🛵 Entrega e retirada</span>
+          <span>🏠 <strong>Retirada no balcão</strong></span>
         </div>
       </div>
       <div class="plate-stack" aria-hidden="true">
@@ -238,7 +240,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
     <div class="wrap">
       <span>Massa de longa fermentação</span>
       <span>Molho de tomate artesanal</span>
-      <span>Fior di Latte</span>
+      <span>Peça no Whats, retire no balcão</span>
       <span>Feita na hora</span>
     </div>
   </div>
@@ -249,7 +251,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
         <div>
           <span class="kicker">Cardápio</span>
           <h2>Pizza Napoletana</h2>
-          <p class="sub">Todas com 30 cm e 6 pedaços. Toque em <b>Adicionar</b> e finalize o pedido pelo WhatsApp.</p>
+          <p class="sub">Todas com 30 cm e 6 pedaços. Toque em <b>Adicionar</b>, envie pelo WhatsApp e retire no balcão.</p>
         </div>
         <span class="size-tag">6 pedaços · 30 cm</span>
       </div>
@@ -282,11 +284,12 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
 
   <section id="como-pedir">
     <div class="wrap">
-      <div class="head"><div><span class="kicker">Como pedir</span><h2>Três toques e pronto.</h2></div></div>
+      <div class="head"><div><span class="kicker">É vizinho?</span><h2>Pede no Whats,<br>retira no balcão.</h2>
+        <p class="sub">Em vez de pedir pelo app de delivery, fale direto com a gente: o pedido chega na hora pra pizzaria e a pizza sai do forno direto pra sua mão, quentinha.</p></div></div>
       <div class="how">
         <div><b>1. Escolha</b><p>Adicione as pizzas que quiser direto do cardápio.</p></div>
-        <div><b>2. Confira</b><p>Diga se é entrega ou retirada, endereço e forma de pagamento.</p></div>
-        <div><b>3. Envie</b><p>O pedido abre pronto no WhatsApp — é só tocar em enviar.</p></div>
+        <div><b>2. Envie</b><p>Diga seu nome e o horário que quer retirar — o pedido abre pronto no WhatsApp.</p></div>
+        <div><b>3. Retire</b><p>A gente avisa quando estiver pronta. É só passar no balcão e pagar na retirada.</p></div>
       </div>
     </div>
   </section>
@@ -294,7 +297,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
   <section id="contato" style="padding-top:0">
     <div class="wrap contact">
       <div class="card">
-        <h3>Onde estamos</h3>
+        <h3>Onde retirar</h3>
         <ul class="info">
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg><div><b data-cfg="address"></b><small>Retirada no balcão</small></div></li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div><b data-cfg="hours"></b><small>Horário de funcionamento</small></div></li>
@@ -336,13 +339,12 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
     <div id="lines"></div>
     <form class="form" id="form" novalidate>
       <label>Seu nome<input name="nome" autocomplete="name" placeholder="Como podemos te chamar?"></label>
-      <div class="seg" role="group" aria-label="Tipo de pedido">
-        <button type="button" data-mode="entrega" aria-pressed="true">🛵 Entrega</button>
-        <button type="button" data-mode="retirada" aria-pressed="false">🏠 Retirada</button>
-      </div>
-      <label id="addrField">Endereço de entrega<input name="endereco" autocomplete="street-address" placeholder="Rua, número, complemento, bairro"></label>
-      <label>Pagamento
-        <select name="pagamento"><option>Pix</option><option>Cartão (na entrega)</option><option>Dinheiro</option></select>
+      <div class="pickup"><b>🏠 Retirada no balcão</b><span data-cfg="address"></span></div>
+      <label>Horário de retirada
+        <select name="horario"><option value="">O quanto antes</option></select>
+      </label>
+      <label>Pagamento na retirada
+        <select name="pagamento"><option>Pix</option><option>Cartão</option><option>Dinheiro</option></select>
       </label>
       <label>Observações<textarea name="obs" rows="2" placeholder="Ex.: sem cebola, troco para R$ 100…"></textarea></label>
     </form>
@@ -354,7 +356,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm4.5 12.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.3-.4.8-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3Z"/></svg>
       Enviar pedido no WhatsApp
     </button>
-    <p class="hint">A taxa de entrega é confirmada pela pizzaria no WhatsApp.</p>
+    <p class="hint">A gente confirma pelo WhatsApp e avisa quando a pizza estiver pronta.</p>
   </div>
 </aside>
 
@@ -386,7 +388,6 @@ const MENU = [
 const brl = v => v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const cart = JSON.parse(sessionStorage.getItem("balcao-cart")||"{}");
-let mode = "entrega";
 
 // config into page
 $$("[data-cfg]").forEach(el => {
@@ -455,24 +456,28 @@ function closeCart(){ drawer.classList.remove("open"); scrim.classList.remove("o
 $("#close").onclick=closeCart; scrim.onclick=closeCart;
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&drawer.classList.contains("open")) closeCart(); });
 
-$$("[data-mode]").forEach(b=>b.onclick=()=>{ mode=b.dataset.mode; $$("[data-mode]").forEach(x=>x.setAttribute("aria-pressed",x===b)); $("#addrField").style.display = mode==="entrega"?"":"none"; });
+// horários de retirada: a cada 15 min, a partir de ~30 min daqui, por 3 horas
+(function(){
+  const sel=document.querySelector('select[name=horario]'), d=new Date(Date.now()+30*60000);
+  d.setMinutes(Math.ceil(d.getMinutes()/15)*15,0,0);
+  for(let i=0;i<12;i++){ const h=new Date(d.getTime()+i*15*60000); const s=h.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); sel.add(new Option("Às "+s,s)); }
+})();
 
 $("#send").onclick=()=>{
   const f=$("#form"), {qty,sum}=totals(), err=$("#err");
-  const nome=f.nome.value.trim(), end=f.endereco.value.trim();
+  const nome=f.nome.value.trim(), hora=f.horario.value;
   err.textContent="";
   if(!qty) return err.textContent="Adicione pelo menos uma pizza.";
   if(sum<CONFIG.minOrder) return err.textContent="Pedido mínimo de "+brl(CONFIG.minOrder)+".";
   if(!nome){ err.textContent="Digite seu nome."; return f.nome.focus(); }
-  if(mode==="entrega"&&!end){ err.textContent="Digite o endereço de entrega."; return f.endereco.focus(); }
   const lines = MENU.filter(p=>cart[p.id]).map(p=>`• ${cart[p.id]}x ${p.name} — ${brl(cart[p.id]*p.price)}`);
   const msg = [
-    "🍕 *Novo pedido — Balcão Pizza Napoletana*","",
+    "🍕 *Pedido para retirada — Balcão Pizza Napoletana*","",
     ...lines,"",
-    `*Total das pizzas:* ${brl(sum)}`,
+    `*Total:* ${brl(sum)}`,
     `*Nome:* ${nome}`,
-    mode==="entrega" ? `*Entrega:* ${end}` : "*Retirada no balcão*",
-    `*Pagamento:* ${f.pagamento.value}`,
+    `*Retirada no balcão:* ${hora ? "às "+hora : "o quanto antes"}`,
+    `*Pagamento na retirada:* ${f.pagamento.value}`,
     f.obs.value.trim() ? `*Obs.:* ${f.obs.value.trim()}` : "",
     "","Pedido feito pelo site."
   ].filter((l,i,a)=>l!==""||a[i-1]!=="").join("\n");
