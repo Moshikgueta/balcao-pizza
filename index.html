@@ -186,6 +186,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
 .hint{font-size:12.5px;color:var(--muted);text-align:center;margin:10px 0 0}
 .pickup{display:grid;gap:2px;background:#fff;border:1.5px dashed var(--wine-2);border-radius:12px;padding:12px 14px;font-size:14.5px;color:var(--muted)}
 .pickup b{color:var(--wine);font-size:15.5px}
+.dot{width:9px;height:9px;border-radius:50%;background:#B9A99B;display:inline-block}
+.dot.on{background:#1FA855;box-shadow:0 0 0 3px rgba(31,168,85,.2)}
+.closed-note{font-size:13.5px;color:var(--wine);margin:0}
+.closed-note:empty{display:none}
 .err{color:#9E2B1E;font-size:13.5px;margin:0;min-height:1em}
 </style>
 </head>
@@ -225,6 +229,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
           <span><span class="star" aria-hidden="true">★</span><strong>5,0</strong> · 16 avaliações</span>
           <span>🍕 <strong>30 cm</strong> · 6 pedaços</span>
           <span>🏠 <strong>Retirada no balcão</strong></span>
+          <span data-status></span>
         </div>
       </div>
       <div class="plate-stack" aria-hidden="true">
@@ -340,6 +345,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
     <form class="form" id="form" novalidate>
       <label>Seu nome<input name="nome" autocomplete="name" placeholder="Como podemos te chamar?"></label>
       <div class="pickup"><b>🏠 Retirada no balcão</b><span data-cfg="address"></span></div>
+      <p class="closed-note" data-closed-note></p>
       <label>Horário de retirada
         <select name="horario"><option value="">O quanto antes</option></select>
       </label>
@@ -365,7 +371,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
 const CONFIG = {
   whatsapp: "5541992132280",           // DDI + DDD + número, só dígitos. Ex.: 5511987654321
   address:  "Alameda Augusto Stellfeld, 1277 — Curitiba · CEP 80430-140",                       // ex.: "Rua Exemplo, 123 — Bairro, Curitiba" (vazio = combinado no WhatsApp)
-  hours:    "",                         // ex.: "Ter a Dom · 18h às 23h" (vazio = some do site)
+  hours:    "Terça a domingo · 18h às 23h", // texto mostrado no site
+  openDays: [2,3,4,5,6,0],              // dias abertos: 0=dom 1=seg 2=ter … 6=sáb
+  openFrom: 18*60,                      // abre às 18:00 (em minutos)
+  openTo:   23*60,                      // fecha às 23:00
   instagram:"@balcaopizzanapoletana",
   minOrder: 20                          // pedido mínimo em R$
 };
@@ -459,11 +468,35 @@ function closeCart(){ drawer.classList.remove("open"); scrim.classList.remove("o
 $("#close").onclick=closeCart; scrim.onclick=closeCart;
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&drawer.classList.contains("open")) closeCart(); });
 
-// horários de retirada: a cada 15 min, a partir de ~30 min daqui, por 3 horas
+// horário de funcionamento (sempre no fuso de Curitiba, seja qual for o fuso do celular)
+const DIAS = ["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
+function spNow(){
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:"America/Sao_Paulo",weekday:"short",hour:"numeric",minute:"numeric",hourCycle:"h23"})
+    .formatToParts(new Date()).map(x=>[x.type,x.value]));
+  return { dow:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(p.weekday), min:(+p.hour)*60+(+p.minute) };
+}
+const hhmm = m => String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+function isOpenNow(){ const n=spNow(); return CONFIG.openDays.includes(n.dow) && n.min>=CONFIG.openFrom && n.min<CONFIG.openTo; }
+function nextOpenDay(){ // 0 = hoje (se ainda vai abrir), 1 = amanhã…
+  const n=spNow();
+  for(let i=0;i<8;i++){ const d=(n.dow+i)%7; if(CONFIG.openDays.includes(d) && (i>0 || n.min<CONFIG.openTo-15)) return {i,d}; }
+}
+// horários de retirada: a cada 15 min, só dentro do horário de funcionamento
 (function(){
-  const sel=document.querySelector('select[name=horario]'), d=new Date(Date.now()+30*60000);
-  d.setMinutes(Math.ceil(d.getMinutes()/15)*15,0,0);
-  for(let i=0;i<12;i++){ const h=new Date(d.getTime()+i*15*60000); const s=h.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); sel.add(new Option("Às "+s,s)); }
+  const sel=document.querySelector('select[name=horario]'); sel.innerHTML="";
+  const n=spNow(), nx=nextOpenDay(), last=CONFIG.openTo-15;
+  const dia = nx.i===0 ? "hoje" : nx.i===1 ? "amanhã" : DIAS[nx.d];
+  let start = CONFIG.openFrom + 30;                       // primeiro horário: 30 min depois de abrir
+  if(nx.i===0) start = Math.max(start, Math.ceil((n.min+30)/15)*15);
+  if(isOpenNow()) sel.add(new Option("O quanto antes", ""));
+  for(let m=start; m<=last; m+=15) sel.add(new Option(`${dia[0].toUpperCase()+dia.slice(1)} às ${hhmm(m)}`, `${dia} às ${hhmm(m)}`));
+  // aviso de aberto / fechado
+  const st=document.querySelector("[data-status]");
+  if(st) st.innerHTML = isOpenNow()
+    ? `<span class="dot on"></span><strong>Aberto agora</strong> · até ${hhmm(CONFIG.openTo).replace(":00","h")}`
+    : `<span class="dot"></span><strong>Fechado agora</strong> · abre ${dia} às ${hhmm(CONFIG.openFrom).replace(":00","h")}`;
+  const note=document.querySelector("[data-closed-note]");
+  if(note && !isOpenNow()) note.textContent = `Estamos fechados agora — você já pode deixar seu pedido para retirar ${dia}.`;
 })();
 
 $("#send").onclick=()=>{
@@ -479,7 +512,7 @@ $("#send").onclick=()=>{
     ...lines,"",
     `*Total:* ${brl(sum)}`,
     `*Nome:* ${nome}`,
-    `*Retirada no balcão:* ${hora ? "às "+hora : "o quanto antes"}`,
+    `*Retirada no balcão:* ${hora || "o quanto antes"}`,
     `*Pagamento na retirada:* ${f.pagamento.value}`,
     f.obs.value.trim() ? `*Obs.:* ${f.obs.value.trim()}` : "",
     "","Pedido feito pelo site."
