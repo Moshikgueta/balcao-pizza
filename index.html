@@ -363,10 +363,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
 <script>
 /* ========= EDITE AQUI ========= */
 const CONFIG = {
-  whatsapp: "5500000000000",           // DDI + DDD + número, só dígitos. Ex.: 5511987654321
-  address:  "Endereço da pizzaria",     // ex.: "Rua Exemplo, 123 — Bairro, Cidade"
-  hours:    "Ter a Dom · 18h às 23h",   // confirme o horário
-  instagram:"@balcaopizza",             // confirme o @
+  whatsapp: "5541992132280",           // DDI + DDD + número, só dígitos. Ex.: 5511987654321
+  address:  "",                         // ex.: "Rua Exemplo, 123 — Bairro, Curitiba" (vazio = combinado no WhatsApp)
+  hours:    "",                         // ex.: "Ter a Dom · 18h às 23h" (vazio = some do site)
+  instagram:"@balcaopizzanapoletana",
   minOrder: 20                          // pedido mínimo em R$
 };
 const MENU = [
@@ -392,7 +392,10 @@ const cart = JSON.parse(sessionStorage.getItem("balcao-cart")||"{}");
 // config into page
 $$("[data-cfg]").forEach(el => {
   const k = el.dataset.cfg;
-  el.textContent = k==="minOrderTxt" ? brl(CONFIG.minOrder) : CONFIG[k];
+  if(k==="minOrderTxt") return el.textContent = brl(CONFIG.minOrder);
+  if(k==="address" && !CONFIG.address) return el.textContent = "Endereço combinado pelo WhatsApp";
+  if(!CONFIG[k]) return el.closest("li") ? el.closest("li").remove() : el.remove();
+  el.textContent = CONFIG[k];
 });
 $$("[data-year]").forEach(el => el.textContent = new Date().getFullYear());
 const waBase = "https://wa.me/" + CONFIG.whatsapp;
