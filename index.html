@@ -89,6 +89,47 @@ h1 i{color:var(--wine)}
 .hero-photo figcaption{display:flex;justify-content:space-between;font-size:13.5px;color:var(--muted);margin-top:12px}
 @media (max-width:900px){.hero{padding:24px 0 72px}.hero-grid{grid-template-columns:1fr;gap:32px}.hero-photo{order:-1}.meta b{font-size:22px}.meta div{padding-right:16px;margin-right:16px}}
 
+
+/* ---------- topo cinematográfico (rolagem controla a cena) ---------- */
+.cine{position:relative;height:250vh}
+.cine-stick{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;display:flex;align-items:center}
+.cine-grid{display:grid;grid-template-columns:1fr 1.05fr .85fr;gap:32px;align-items:center;width:min(1280px,100% - 48px)}
+.cine-title{font:400 clamp(64px,9.5vw,148px)/.86 var(--serif);letter-spacing:-.025em;margin:0 0 30px;text-transform:uppercase}
+.cine-title .ln{display:block;will-change:transform,opacity}
+.cine-title .it{font-style:italic;text-transform:none;color:var(--wine);font-size:.78em;margin-top:.08em}
+.cine-more{display:inline-flex;gap:10px;align-items:center;font-size:15px;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink);padding-bottom:3px}
+.cine-stage{position:relative;aspect-ratio:1;width:100%}
+.cine-pizza{position:absolute;inset:4%;border-radius:50%;will-change:transform}
+.cine-pizza::before{content:"";position:absolute;inset:8% 0 -10%;border-radius:50%;background:radial-gradient(closest-side,rgba(60,20,8,.38),rgba(60,20,8,0));z-index:-1}
+.cine-pizza img{width:100%;height:100%;object-fit:cover;border-radius:50%;clip-path:circle(47% at 50% 50%);transform:scale(1.06)}
+.flour{position:absolute;inset:-30% -10% 0;pointer-events:none}
+.flour i{position:absolute;top:0;width:var(--s);height:var(--s);border-radius:50%;background:#FFFDF8;box-shadow:0 0 6px rgba(255,255,255,.9);opacity:0;will-change:transform,opacity}
+.cine-side{will-change:transform,opacity}
+.cine-num{display:block;font:400 clamp(56px,6vw,84px)/1 var(--serif);color:var(--wine)}
+.cine-k{margin:4px 0 18px;font-size:12.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.cine-h{font:400 clamp(26px,2.4vw,34px)/1.08 var(--serif);margin:0 0 12px}
+.cine-h i{color:var(--wine)}
+.cine-p{color:var(--muted);margin:0 0 22px;font-size:15.5px}
+.cine-side .meta{margin-top:26px}
+.cine-hint{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);font-size:13px;color:var(--muted);letter-spacing:.06em}
+.cine-hint span{display:inline-block;animation:hintb 1.6s ease-in-out infinite}
+@keyframes hintb{50%{transform:translateY(4px)}}
+@media (max-width:900px){
+  .cine{height:220vh}
+  .cine-stick{align-items:flex-start;padding-top:14px}
+  .cine-grid{grid-template-columns:1fr;gap:6px;width:calc(100% - 36px)}
+  .cine-title{font-size:clamp(48px,15vw,76px);margin:0 0 4px}
+  .cine-more{display:none}
+  .cine-stage{width:min(72vw,44svh);margin:0 auto}
+  .cine-side{position:absolute;left:18px;right:18px;bottom:calc(16px + env(safe-area-inset-bottom));background:rgba(251,248,243,.94);border-radius:14px;padding:16px 18px;box-shadow:0 18px 40px -22px rgba(30,22,17,.45)}
+  .cine-num{display:inline;font-size:36px;margin-right:8px}
+  .cine-k{display:inline;margin:0}
+  .cine-h,.cine-side .meta{display:none}
+  .cine-p{margin:8px 0 12px;font-size:14.5px}
+  .cine-side .cta .btn{height:44px;padding:0 16px}
+}
+@media (prefers-reduced-motion:reduce){.cine{height:auto}.cine-stick{position:relative;height:auto;padding:40px 0 80px}.cine-hint{display:none}}
+
 /* ---------- section heads ---------- */
 section{padding:104px 0}
 .sec-head{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:end;margin-bottom:48px}
@@ -267,29 +308,34 @@ footer a{text-decoration:none}
 </header>
 
 <main>
-  <section class="hero" aria-label="Apresentação">
-    <div class="wrap hero-grid">
-      <div>
-        <p class="eyebrow">Ciao, vizinho! · Pizzaria napoletana em Curitiba</p>
-        <h1>Pizza napoletana, do forno direto para o <i>balcão.</i></h1>
-        <p class="lead">Cada pizza é feita à mão, uma a uma, com massa de 48 horas de fermentação lenta. Escolha aqui, mande o pedido pelo WhatsApp e retire com a gente na Alameda Augusto Stellfeld.</p>
-        <div class="cta">
-          <a class="btn btn-wine" href="#cardapio">Escolher pizzas</a>
-          <a class="btn btn-line" data-wa-link href="#" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm4.5 12.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.3-.4.8-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3Z"/></svg>
-            Falar no WhatsApp
-          </a>
+  <section class="cine" id="cine" aria-label="Apresentação">
+    <div class="cine-stick">
+      <div class="wrap cine-grid">
+        <div class="cine-left">
+          <p class="eyebrow">Ciao, vizinho! · Pizzaria napoletana em Curitiba</p>
+          <h1 class="cine-title"><span class="ln">Feita</span><span class="ln">à mão,</span><span class="ln it">uma a uma.</span></h1>
+          <a class="cine-more" href="#cardapio">Ver o cardápio <span aria-hidden="true">→</span></a>
         </div>
-        <div class="meta">
-          <div><b>5,0</b>16 avaliações</div>
-          <div><b>48 h</b>de fermentação</div>
-          <div><b>30 cm</b>6 pedaços</div>
+        <div class="cine-stage" aria-hidden="true">
+          <div class="flour" id="flour"></div>
+          <div class="cine-pizza" id="cinePizza"><img src="img/lg/margherita.jpg" alt="" width="901" height="901" fetchpriority="high"></div>
         </div>
+        <aside class="cine-side" id="cineSide">
+          <span class="cine-num">48h</span>
+          <p class="cine-k">Massa de fermentação lenta</p>
+          <h2 class="cine-h">Pizza napoletana, do forno direto para o <i>balcão.</i></h2>
+          <p class="cine-p">Aberta à mão, uma de cada vez. Escolha aqui, mande o pedido pelo WhatsApp e retire com a gente na Alameda Augusto Stellfeld.</p>
+          <div class="cta">
+            <a class="btn btn-wine" href="#cardapio">Escolher pizzas</a>
+            <a class="btn btn-line" data-wa-link href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm4.5 12.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.3-.4.8-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3Z"/></svg>WhatsApp</a>
+          </div>
+          <div class="meta">
+            <div><b>5,0</b>16 avaliações</div>
+            <div><b>30 cm</b>6 pedaços</div>
+          </div>
+        </aside>
       </div>
-      <figure class="hero-photo">
-        <img src="img/lg/margherita.jpg" alt="Pizza Margherita com Fior di Latte e manjericão" width="901" height="901" fetchpriority="high">
-        <figcaption><span>Margherita</span><span class="num">R$ 47,90</span></figcaption>
-      </figure>
+      <div class="cine-hint" id="cineHint" aria-hidden="true">Role para ver <span>↓</span></div>
     </div>
   </section>
 
@@ -609,6 +655,40 @@ $("#send").onclick = () => {
   ].filter(l=>l!==null).join("\n");
   window.open(waBase+"?text="+encodeURIComponent(msg),"_blank","noopener");
 };
+
+
+/* ---------- topo cinematográfico ---------- */
+(function(){
+  const sec=$("#cine"), pizza=$("#cinePizza"), side=$("#cineSide"), hint=$("#cineHint"), lines=$$(".cine-title .ln"), flour=$("#flour");
+  if(!sec) return;
+  const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)), seg=(p,a,b)=>clamp((p-a)/(b-a)), ease=x=>1-Math.pow(1-x,3);
+  // farinha: poucas partículas (leve no celular)
+  const N = innerWidth<700 ? 10 : 18, dots=[];
+  for(let k=0;k<N;k++){ const i=document.createElement("i"); const s=2+Math.random()*4; i.style.setProperty("--s",s+"px");
+    i.style.left=(Math.random()*100)+"%"; flour.appendChild(i); dots.push({i,sp:.6+Math.random()*.8,dl:Math.random()*.25,sw:(Math.random()-.5)*40}); }
+  if(reduce){ side.style.opacity=1; return; }
+  let ticking=false;
+  function frame(){
+    ticking=false;
+    const r=sec.getBoundingClientRect(), vh=innerHeight, total=sec.offsetHeight-vh;
+    const p=clamp(-r.top/total); const mob=innerWidth<=900;
+    // 1) a pizza desce girando e cresce até se encaixar
+    const a=ease(seg(p,0,.55));
+    const y=(1-a)*(mob? -10 : -32), rot=(1-a)*-260, sc=.5+.5*a;
+    const b=ease(seg(p,.7,1));                       // 3) leve recuo no fim
+    pizza.style.transform=`translateY(${y}vh) rotate(${rot}deg) scale(${sc*(1-.06*b)})`;
+    // 2) título entra linha a linha
+    lines.forEach((l,k)=>{ const q=ease(seg(p,0,.3+k*.06)); l.style.transform=`translateY(${(1-q)*18}px)`; });
+    // painel lateral
+    const s=ease(seg(p,.38,.62)); side.style.opacity=s; side.style.transform=`translateY(${(1-s)*30}px)`; side.style.pointerEvents=s>.5?"auto":"none";
+    hint.style.opacity=1-seg(p,0,.12);
+    // farinha caindo junto com a pizza
+    dots.forEach(d=>{ const q=seg(p,d.dl,d.dl+.5*d.sp); d.i.style.opacity=q>0&&q<1? (q<.2?q*5:1-q)*.9 : 0;
+      d.i.style.transform=`translate(${d.sw*q}px,${q*(mob?55:70)}vh)`; });
+  }
+  const onScroll=()=>{ if(!ticking){ ticking=true; requestAnimationFrame(frame); } };
+  addEventListener("scroll",onScroll,{passive:true}); addEventListener("resize",onScroll); frame();
+})();
 
 const hdr=$("header"); addEventListener("scroll",()=>hdr.classList.toggle("scrolled",scrollY>40),{passive:true});
 select("margherita", false);
