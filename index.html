@@ -102,6 +102,8 @@ h2{font:400 clamp(42px,5.2vw,68px)/1 var(--serif);letter-spacing:-.01em;margin:0
 .stage{position:sticky;top:96px;background:var(--card);border-radius:8px;padding:28px 32px 32px;box-shadow:0 0 0 1px var(--line)}
 .plate{position:relative;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 50%,#fff 0 58%,#F1EBE2 58.5% 70%,transparent 70.5%);display:grid;place-items:center;margin:0 auto 20px;max-width:min(400px,44vh)}
 .plate img{width:82%;aspect-ratio:1;object-fit:cover;border-radius:50%;box-shadow:0 22px 40px -18px rgba(60,20,8,.5),0 2px 6px rgba(60,20,8,.12);will-change:transform}
+.plate .flour{position:absolute;inset:-40% -10% 0;pointer-events:none;z-index:2}
+.plate .flour i{position:absolute;top:0;width:var(--s);height:var(--s);border-radius:50%;background:#FFFDF8;box-shadow:0 0 6px rgba(255,255,255,.9);opacity:0;will-change:transform,opacity}
 .plate .size{position:absolute;right:2%;bottom:6%;font-size:12.5px;color:var(--muted);background:var(--card);padding:5px 10px;border-radius:20px;box-shadow:0 0 0 1px var(--line)}
 .stage-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px}
 .stage h3{font:400 40px/1.05 var(--serif);margin:0}
@@ -302,7 +304,7 @@ footer a{text-decoration:none}
       <div class="menu">
         <aside class="stage" id="stage" aria-label="Pizza selecionada">
           <button class="sheet-close" type="button" data-close-stage aria-label="Fechar">×</button>
-          <div class="plate"><img id="stageImg" src="img/lg/margherita.jpg" alt="" width="901" height="901"><span class="size">30 cm · 6 pedaços</span></div>
+          <div class="plate"><div class="flour" id="flour" aria-hidden="true"></div><img id="stageImg" src="img/lg/margherita.jpg" alt="" width="901" height="901"><span class="size">30 cm · 6 pedaços</span></div>
           <div class="tags" id="stageTags"></div>
           <div class="stage-head"><h3 id="stageName">Margherita</h3><span class="price" id="stagePrice"></span></div>
           <p class="desc" id="stageDesc"></p>
@@ -497,6 +499,29 @@ list.innerHTML = MENU.map((p,i)=>`
     <span class="p">${brl(p.price)}</span>
   </button></li>`).join("");
 
+/* ---------- cardápio cinematográfico: pizza caindo no prato, com farinha ---------- */
+const flourEl = $("#flour"), FL = [];
+for(let k=0;k<(innerWidth<700?10:16);k++){ const i=document.createElement("i"); i.style.setProperty("--s",(2+Math.random()*4)+"px"); i.style.left=(Math.random()*100)+"%"; flourEl.appendChild(i);
+  FL.push({i,dl:Math.random()*.25,sp:.6+Math.random()*.8,sw:(Math.random()-.5)*40}); }
+function flourBurst(){ if(reduce||!flourEl.animate) return;
+  FL.forEach(d=>d.i.animate([{transform:"translate(0,0)",opacity:0},{opacity:.9,offset:.15},{transform:`translate(${d.sw}px,${flourEl.clientHeight*(.75+d.sp*.2)}px)`,opacity:0}],
+    {duration:900+d.sp*500,delay:d.dl*600,easing:"cubic-bezier(.3,.1,.6,1)"})); }
+// no computador, ao rolar até o cardápio a pizza desce girando até o prato (acompanha a rolagem)
+(function(){
+  const sec=$("#cardapio"), im=$("#stageImg"); if(!sec||reduce) return;
+  const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)), ease=x=>1-Math.pow(1-x,3);
+  let ticking=false;
+  function frame(){ ticking=false;
+    if(innerWidth<=900){ im.style.translate=""; im.style.rotate=""; im.style.scale=""; return; }
+    const r=$("#stage").getBoundingClientRect(), vh=innerHeight;
+    const p=ease(clamp((vh-r.top)/(vh*.85)));
+    im.style.translate=`0 ${(1-p)*-45}vh`; im.style.rotate=`${(1-p)*-260}deg`; im.style.scale=`${.5+.5*p}`;
+    FL.forEach(d=>{ const q=clamp((p-d.dl)/(.55*d.sp)); d.i.style.opacity=q>0&&q<1?(q<.2?q*5:1-q)*.9:0; d.i.style.transform=`translate(${d.sw*q}px,${q*flourEl.clientHeight*.85}px)`; });
+  }
+  const on=()=>{ if(!ticking){ ticking=true; requestAnimationFrame(frame); } };
+  addEventListener("scroll",on,{passive:true}); addEventListener("resize",on); frame();
+})();
+
 /* ---------- vitrine ---------- */
 let current = null, qty = 1;
 MENU.forEach(p => { const im = new Image(); im.src = img(p.id,"lg"); }); // pré-carrega: a troca fica instantânea
@@ -515,9 +540,15 @@ function select(id, animate=true){
   im.alt = "Pizza " + p.name;
   im.src = img(id,"lg");
   if(animate && im.animate){
-    im.animate(reduce ? [{opacity:0},{opacity:1}]
-      : [{transform:"rotate(-70deg) scale(.86)",opacity:0},{transform:"rotate(0) scale(1)",opacity:1}],
-      {duration:reduce?150:560,easing:"cubic-bezier(.23,1,.32,1)"});
+    if(reduce) im.animate([{opacity:0},{opacity:1}],{duration:150});
+    else { im.animate([
+        {transform:"translateY(-55%) rotate(-220deg) scale(.55)",opacity:0},
+        {opacity:1,offset:.2},
+        {transform:"translateY(0) rotate(0) scale(1.03)",opacity:1,offset:.78},
+        {transform:"translateY(-2%) rotate(0) scale(1)",offset:.9},
+        {transform:"translateY(0) rotate(0) scale(1)",opacity:1}
+      ],{duration:820,easing:"cubic-bezier(.33,1,.68,1)"});
+      flourBurst(); }
   }
   updateAdd();
 }
