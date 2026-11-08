@@ -102,14 +102,19 @@ h2{font:400 clamp(42px,5.2vw,68px)/1 var(--serif);letter-spacing:-.01em;margin:0
 .stage{position:sticky;top:96px;background:var(--card);border-radius:8px;padding:28px 32px 32px;box-shadow:0 0 0 1px var(--line)}
 .plate{position:relative;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 50%,#fff 0 58%,#F1EBE2 58.5% 70%,transparent 70.5%);display:grid;place-items:center;margin:0 auto 20px;max-width:min(400px,44vh)}
 .plate img{width:82%;aspect-ratio:1;object-fit:cover;border-radius:50%;box-shadow:0 22px 40px -18px rgba(60,20,8,.5),0 2px 6px rgba(60,20,8,.12);will-change:transform}
+.plate .build{position:absolute;left:9%;top:9%;width:82%;height:82%;pointer-events:none;opacity:0}
+.plate .dough{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 50% 45%,#F6E3BC 0 62%,#EBCB92 72%,#D9A866 84%,#C18545 94%,#A96C33 100%);box-shadow:0 22px 40px -18px rgba(60,20,8,.5),0 2px 6px rgba(60,20,8,.12)}
+.plate .sauce{position:absolute;inset:10%;border-radius:50%;background:radial-gradient(circle at 45% 40%,#E0553A 0 35%,#CF4129 60%,#B8331F 100%);box-shadow:inset 0 0 10px rgba(110,20,10,.35);transform:scale(0)}
+.plate img{position:relative;z-index:1}
+.plate .drops{z-index:2}
 .plate .drops{position:absolute;inset:0;pointer-events:none;overflow:visible}
 .plate .drop{position:absolute;left:0;top:0;width:var(--s);height:var(--s);margin:calc(var(--s) / -2) 0 0 calc(var(--s) / -2);will-change:transform,opacity}
 .plate .drop svg{width:100%;height:100%;display:block;filter:drop-shadow(0 3px 3px rgba(60,20,8,.35))}
-.plate .ing-label{position:absolute;left:50%;top:-6px;transform:translateX(-50%);font-size:12px;font-weight:600;color:var(--wine);background:var(--card);padding:4px 10px;border-radius:20px;box-shadow:0 0 0 1px var(--line);white-space:nowrap;opacity:0;transition:opacity .3s ease}
+.plate .ing-label{position:absolute;z-index:3;left:50%;top:-6px;transform:translateX(-50%);font-size:12px;font-weight:600;color:var(--wine);background:var(--card);padding:4px 10px;border-radius:20px;box-shadow:0 0 0 1px var(--line);white-space:nowrap;opacity:0;transition:opacity .3s ease}
 .plate .ing-label.show{opacity:1}
-.replay{position:absolute;left:2%;bottom:6%;font:500 12.5px var(--sans);color:var(--muted);background:var(--card);padding:5px 10px;border-radius:20px;border:0;box-shadow:0 0 0 1px var(--line);cursor:pointer}
+.replay{position:absolute;z-index:3;left:2%;bottom:6%;font:500 12.5px var(--sans);color:var(--muted);background:var(--card);padding:5px 10px;border-radius:20px;border:0;box-shadow:0 0 0 1px var(--line);cursor:pointer}
 @media (hover:hover){.replay:hover{color:var(--ink)}}
-.plate .size{position:absolute;right:2%;bottom:6%;font-size:12.5px;color:var(--muted);background:var(--card);padding:5px 10px;border-radius:20px;box-shadow:0 0 0 1px var(--line)}
+.plate .size{position:absolute;z-index:3;right:2%;bottom:6%;font-size:12.5px;color:var(--muted);background:var(--card);padding:5px 10px;border-radius:20px;box-shadow:0 0 0 1px var(--line)}
 .stage-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px}
 .stage h3{font:400 40px/1.05 var(--serif);margin:0}
 .stage .price{font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -309,7 +314,7 @@ footer a{text-decoration:none}
       <div class="menu">
         <aside class="stage" id="stage" aria-label="Pizza selecionada">
           <button class="sheet-close" type="button" data-close-stage aria-label="Fechar">×</button>
-          <div class="plate"><img id="stageImg" src="img/lg/margherita.jpg" alt="" width="901" height="901"><div class="drops" id="drops" aria-hidden="true"></div><span class="ing-label" id="ingLabel"></span><button type="button" class="replay" id="replay" aria-label="Ver os ingredientes caindo de novo">↻ Ingredientes</button><span class="size">30 cm · 6 pedaços</span></div>
+          <div class="plate"><img id="stageImg" src="img/lg/margherita.jpg" alt="" width="901" height="901"><div class="build" id="build" aria-hidden="true"><div class="dough" id="dough"></div><div class="sauce" id="sauce"></div></div><div class="drops" id="drops" aria-hidden="true"></div><span class="ing-label" id="ingLabel"></span><button type="button" class="replay" id="replay" aria-label="Ver os ingredientes caindo de novo">↻ Ingredientes</button><span class="size">30 cm · 6 pedaços</span></div>
           <div class="tags" id="stageTags"></div>
           <div class="stage-head"><h3 id="stageName">Margherita</h3><span class="price" id="stagePrice"></span></div>
           <p class="desc" id="stageDesc"></p>
@@ -521,50 +526,66 @@ const ING = {
 };
 // ordem = ordem em que caem (molho primeiro, folhas por último)
 const TOPPINGS = {
-  "mussarela":   [["tomato",2],["mozz",6],["oregano",8],["olive",2]],
-  "calabresa":   [["tomato",2],["mozz",4],["calab",6],["onion",4],["olive",1]],
-  "tres-queijos":[["tomato",2],["mozz",4],["gorg",4],["parm",5]],
-  "margherita":  [["tomato",2],["fior",5],["parm",4],["basil",5],["olive",1]],
-  "diavola":     [["tomato",2],["fior",3],["pepper",7],["basil",3]],
-  "gorgonzola":  [["tomato",2],["mozz",3],["gorg",4],["mush",6],["olive",1]]
+  "mussarela":   [["tomato",2],["mozz",16],["oregano",14],["olive",3]],
+  "calabresa":   [["tomato",2],["mozz",10],["calab",12],["onion",9],["olive",2]],
+  "tres-queijos":[["tomato",2],["mozz",10],["gorg",8],["parm",10]],
+  "margherita":  [["tomato",2],["fior",10],["parm",8],["basil",8],["olive",2]],
+  "diavola":     [["tomato",2],["fior",8],["pepper",12],["basil",6]],
+  "gorgonzola":  [["tomato",2],["mozz",8],["gorg",8],["mush",10],["olive",2]]
 };
 const dropsEl = $("#drops"), ingLabel = $("#ingLabel"); let dropAnims = [], labelT;
 function rnd(seed){ let s=seed; return ()=>{ s=(s*16807)%2147483647; return (s-1)/2147483646; }; }
-function dropToppings(id){
-  dropAnims.forEach(a=>a.cancel()); dropAnims=[]; dropsEl.innerHTML=""; clearTimeout(labelT);
-  if(reduce || !dropsEl.animate) return;
-  const plan = TOPPINGS[id]; if(!plan) return;
-  const W = dropsEl.clientWidth, R = W*0.41*0.82;   // raio útil sobre a pizza
-  const r = rnd([...id].reduce((a,c)=>a+c.charCodeAt(0),7)*97);
-  let delay = 120;
-  plan.forEach(([key,count],gi)=>{
-    const ing = ING[key];
-    setTimeout(()=>{ ingLabel.textContent = "+ "+ing.n; ingLabel.classList.add("show"); }, delay);
-    for(let k=0;k<count;k++){
-      const ang = r()*Math.PI*2, dist = Math.sqrt(r())*R;
-      const x = W/2 + Math.cos(ang)*dist, y = W/2 + Math.sin(ang)*dist;
-      const scale = W/440, s = Math.round(ing.s*scale*(0.85+r()*0.35));
-      const rot0 = r()*360-180, rot1 = rot0 + (r()*160-80), drift = (r()*60-30)*scale;
-      const d = document.createElement("span"); d.className="drop"; d.style.setProperty("--s", s+"px"); d.innerHTML = ing.svg;
-      dropsEl.appendChild(d);
-      const dur = 650 + r()*250, start = delay + k*70;
-      const a = d.animate([
-        {transform:`translate(${x+drift}px,${y - W*0.75}px) rotate(${rot0}deg) scale(1.15)`, opacity:0},
-        {opacity:1, offset:.15},
-        {transform:`translate(${x}px,${y}px) rotate(${rot1}deg) scale(1)`, opacity:1, offset:.82, easing:"ease-out"},
-        {transform:`translate(${x}px,${y - 6*scale}px) rotate(${rot1}deg) scale(1)`, opacity:1, offset:.91},
-        {transform:`translate(${x}px,${y}px) rotate(${rot1}deg) scale(1)`, opacity:1}
-      ], {duration:dur, delay:start, fill:"both", easing:"cubic-bezier(.45,0,.75,.6)"});
-      dropAnims.push(a);
-    }
-    delay += count*70 + 260;
-  });
-  // depois que tudo caiu, os ingredientes somem e fica só a foto da pizza
-  const end = delay + 900;
-  labelT = setTimeout(()=>{ ingLabel.classList.remove("show");
-    dropAnims.forEach(a=>{ const el=a.effect.target; el.animate([{opacity:1},{opacity:0}],{duration:500,fill:"forwards",easing:"ease"}); }); }, end);
+const buildEl = $("#build"), sauceEl = $("#sauce"), doughEl = $("#dough"); let buildT = [];
+const later = (fn,ms)=>buildT.push(setTimeout(fn,ms));
+function resetBuild(){
+  buildT.forEach(clearTimeout); buildT=[]; dropAnims.forEach(a=>a.cancel()); dropAnims=[];
+  dropsEl.innerHTML=""; ingLabel.classList.remove("show");
+  [doughEl,sauceEl,buildEl,$("#stageImg")].forEach(el=>el.getAnimations().forEach(a=>a.cancel()));
 }
-$("#replay").onclick = () => dropToppings(current);
+function say(txt,at){ later(()=>{ ingLabel.textContent=txt; ingLabel.classList.add("show"); }, at); }
+// A pizza começa como massa vazia, recebe o molho e os ingredientes, e no fim vira a foto real.
+function buildPizza(id){
+  resetBuild();
+  const im = $("#stageImg");
+  if(reduce || !im.animate){ buildEl.style.opacity=0; im.style.clipPath=""; return; }
+  const plan = (TOPPINGS[id]||[]).filter(([k])=>k!=="tomato");
+  const W = dropsEl.clientWidth, R = W*0.41*0.80, scale = W/440;
+  const r = rnd([...id].reduce((a,c)=>a+c.charCodeAt(0),7)*97);
+  const F = {fill:"both"};
+  // foto escondida; massa aparece
+  im.animate([{clipPath:"circle(0% at 50% 50%)"},{clipPath:"circle(0% at 50% 50%)"}],{duration:1,...F});
+  buildEl.animate([{opacity:1},{opacity:1}],{duration:1,...F});
+  doughEl.animate([{transform:"scale(.6) rotate(-90deg)",opacity:0},{transform:"scale(1) rotate(0)",opacity:1}],{duration:520,easing:"cubic-bezier(.23,1,.32,1)",...F});
+  say("massa de 48h", 0);
+  // molho se espalha em espiral
+  sauceEl.animate([{transform:"scale(0) rotate(-180deg)",opacity:.9},{transform:"scale(1) rotate(0)",opacity:1}],{duration:650,delay:520,easing:"cubic-bezier(.33,1,.68,1)",...F});
+  say("+ molho de tomate", 520);
+  let delay = 1250;
+  plan.forEach(([key,count])=>{
+    const ing = ING[key]; say("+ "+ing.n, delay);
+    for(let k=0;k<count;k++){
+      const ang=r()*Math.PI*2, dist=Math.sqrt(r())*R, x=W/2+Math.cos(ang)*dist, y=W/2+Math.sin(ang)*dist;
+      const s=Math.round(ing.s*scale*1.25*(0.85+r()*0.35)), rot0=r()*360-180, rot1=rot0+(r()*160-80), drift=(r()*60-30)*scale;
+      const d=document.createElement("span"); d.className="drop"; d.style.setProperty("--s",s+"px"); d.innerHTML=ing.svg; dropsEl.appendChild(d);
+      dropAnims.push(d.animate([
+        {transform:`translate(${x+drift}px,${y-W*0.75}px) rotate(${rot0}deg) scale(1.2)`,opacity:0},
+        {opacity:1,offset:.15},
+        {transform:`translate(${x}px,${y}px) rotate(${rot1}deg) scale(1)`,opacity:1,offset:.82,easing:"ease-out"},
+        {transform:`translate(${x}px,${y-6*scale}px) rotate(${rot1}deg) scale(1)`,opacity:1,offset:.91},
+        {transform:`translate(${x}px,${y}px) rotate(${rot1}deg) scale(1)`,opacity:1}
+      ],{duration:600+r()*200,delay:delay+k*35,easing:"cubic-bezier(.45,0,.75,.6)",...F}));
+    }
+    delay += count*35 + 300;
+  });
+  // forno: a foto real abre do centro para fora e cobre a montagem
+  const oven = delay + 500;
+  say("pronta!", oven);
+  im.animate([{clipPath:"circle(0% at 50% 50%)"},{clipPath:"circle(72% at 50% 50%)"}],{duration:900,delay:oven,easing:"cubic-bezier(.65,0,.35,1)",fill:"forwards"});
+  later(()=>{ buildEl.animate([{opacity:1},{opacity:0}],{duration:400,fill:"forwards"});
+    dropAnims.forEach(a=>a.effect.target.animate([{opacity:1},{opacity:0}],{duration:400,fill:"forwards"})); }, oven+700);
+  later(()=>ingLabel.classList.remove("show"), oven+1500);
+}
+$("#replay").onclick = () => buildPizza(current);
 
 /* ---------- vitrine ---------- */
 let current = null, qty = 1;
@@ -583,12 +604,7 @@ function select(id, animate=true){
   const im = $("#stageImg");
   im.alt = "Pizza " + p.name;
   im.src = img(id,"lg");
-  if(animate && im.animate){
-    im.animate(reduce ? [{opacity:0},{opacity:1}]
-      : [{transform:"rotate(-70deg) scale(.86)",opacity:0},{transform:"rotate(0) scale(1)",opacity:1}],
-      {duration:reduce?150:560,easing:"cubic-bezier(.23,1,.32,1)"});
-  }
-  if(animate) setTimeout(()=>dropToppings(id), reduce?0:380);
+  if(animate) buildPizza(id);
   updateAdd();
 }
 function updateAdd(){
@@ -683,7 +699,7 @@ $("#send").onclick = () => {
 const hdr=$("header"); addEventListener("scroll",()=>hdr.classList.toggle("scrolled",scrollY>40),{passive:true});
 select("margherita", false);
 // primeira vez que o cardápio aparece na tela: os ingredientes caem na Margherita
-if("IntersectionObserver" in window) new IntersectionObserver((es,o)=>{ if(es[0].isIntersecting){ o.disconnect(); setTimeout(()=>dropToppings(current),300); } },{threshold:.45}).observe($("#stage"));
+if("IntersectionObserver" in window) new IntersectionObserver((es,o)=>{ if(es[0].isIntersecting){ o.disconnect(); buildPizza(current); } },{threshold:.45}).observe($("#stage"));
 render();
 </script>
 </body>
