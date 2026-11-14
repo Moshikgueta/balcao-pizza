@@ -1,0 +1,10 @@
+# Servidor do painel de pedidos e selos. Publicado pelo GitHub Actions (.github/workflows/cloudflare.yml).
+name = "painel-balcao"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "painel-balcao"
+database_id = "__D1_ID__"   # preenchido automaticamente na publicação

@@ -1,0 +1,86 @@
+# Publica na Cloudflare a cada atualização do main (ou pelo botão "Run workflow"):
+#   1. testa o servidor do painel
+#   2. cria o banco D1 "painel-balcao" se ainda não existir e aplica o schema
+#   3. publica o Worker "painel-balcao"
+#   4. monta o site já ligado ao painel e publica o Worker "balcao-pizza"
+# Segredos do repositório (Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_API_TOKEN   obrigatório
+#   CLOUDFLARE_ACCOUNT_ID  só se o token enxergar mais de uma conta
+#   ADMIN_KEY              opcional: senha do painel (também dá para pôr direto no painel da Cloudflare)
+name: Publicar na Cloudflare
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: cloudflare
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
+      WRANGLER: npx --yes wrangler@4
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Conferir o token
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then echo "::error::Falta o segredo CLOUDFLARE_API_TOKEN no repositório."; exit 1; fi
+          [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || unset CLOUDFLARE_ACCOUNT_ID
+          $WRANGLER whoami
+
+      - name: Testes do painel
+        run: node painel-api/test.mjs
+
+      - name: Banco D1 (cria se não existir)
+        run: |
+          [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || unset CLOUDFLARE_ACCOUNT_ID
+          id_do_banco() { $WRANGLER d1 list --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const l=JSON.parse(s.slice(s.indexOf("[")));const d=l.find(x=>x.name==="painel-balcao");process.stdout.write(d?d.uuid:"")})'; }
+          ID=$(id_do_banco)
+          if [ -z "$ID" ]; then $WRANGLER d1 create painel-balcao; ID=$(id_do_banco); fi
+          if [ -z "$ID" ]; then echo "::error::Não consegui criar ou achar o banco D1. Confira se o token tem a permissão D1 Edit."; exit 1; fi
+          sed -i "s/__D1_ID__/$ID/" painel-api/wrangler.toml
+          $WRANGLER d1 execute painel-balcao --remote --yes --file painel-api/schema.sql -c painel-api/wrangler.toml
+
+      - name: Publicar o servidor do painel
+        run: |
+          [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || unset CLOUDFLARE_ACCOUNT_ID
+          $WRANGLER deploy -c painel-api/wrangler.toml | tee painel.log
+          PANEL_URL=$(grep -oE 'https://painel-balcao\.[a-z0-9-]+\.workers\.dev' painel.log | head -1)
+          if [ -z "$PANEL_URL" ]; then echo "::error::O Worker publicou, mas não achei o endereço workers.dev. Ative o subdomínio workers.dev em Workers & Pages."; exit 1; fi
+          echo "PANEL_URL=$PANEL_URL" >> "$GITHUB_ENV"
+          if [ -n "$ADMIN_KEY" ]; then printf '%s' "$ADMIN_KEY" | $WRANGLER secret put ADMIN_KEY -c painel-api/wrangler.toml; fi
+
+      - name: Montar o site ligado ao painel
+        run: |
+          mkdir dist
+          tar --exclude=./.git --exclude=./.github --exclude=./dist --exclude='./*-api' --exclude='*.md' \
+              --exclude=./wrangler.toml --exclude=node_modules --exclude='./_e2e*' -cf - . | tar -xf - -C dist
+          sed -i "s#panelApi: \"\",#panelApi: \"$PANEL_URL\",#" dist/index.html
+          sed -i "s#const API_PADRAO = \"\";#const API_PADRAO = \"$PANEL_URL\";#" dist/painel/index.html
+          grep -q "panelApi: \"$PANEL_URL\"" dist/index.html || { echo "::error::Não consegui ligar o site ao painel."; exit 1; }
+          [ -f dist/404.html ] || cp dist/index.html dist/404.html
+
+      - name: Publicar o site
+        run: |
+          [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || unset CLOUDFLARE_ACCOUNT_ID
+          $WRANGLER deploy | tee site.log
+          SITE_URL=$(grep -oE 'https://balcao-pizza\.[a-z0-9-]+\.workers\.dev' site.log | head -1)
+          {
+            echo "## Publicado na Cloudflare"
+            echo "- Site: $SITE_URL"
+            echo "- Painel: $SITE_URL/painel/"
+            echo "- Servidor do painel: $PANEL_URL"
+            [ -n "$ADMIN_KEY" ] || echo "- ⚠️ Falta a senha do painel: crie o segredo ADMIN_KEY no repositório ou no Worker painel-balcao (Settings → Variables and Secrets)."
+          } >> "$GITHUB_STEP_SUMMARY"

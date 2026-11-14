@@ -41,10 +41,16 @@ const ID_RE = /^B\d{4}-\d{4}-[A-Z0-9]{4}$/;
 const MAX_PEDIDOS_POR_IP_HORA = 12;
 
 /* ---------- utilidades ---------- */
+/** Origens aceitas: o site no GitHub Pages e o site na Cloudflare da MESMA conta
+ *  (painel-balcao.CONTA.workers.dev → balcao-pizza.CONTA.workers.dev). */
+function origens(req) {
+  const h = new URL(req.url).hostname.match(/^painel-balcao\.([a-z0-9-]+)\.workers\.dev$/);
+  return h ? [...ALLOWED_ORIGINS, `https://balcao-pizza.${h[1]}.workers.dev`] : ALLOWED_ORIGINS;
+}
 function cors(req, admin) {
-  const o = req.headers.get("Origin") || "";
+  const o = req.headers.get("Origin") || "", ok = origens(req);
   return {
-    "Access-Control-Allow-Origin": ALLOWED_ORIGINS.includes(o) ? o : ALLOWED_ORIGINS[0],
+    "Access-Control-Allow-Origin": ok.includes(o) ? o : ok[0],
     "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
     "Access-Control-Allow-Headers": admin ? "Content-Type, Authorization" : "Content-Type",
     "Access-Control-Max-Age": "86400",
@@ -119,7 +125,7 @@ export async function handle(req, env) {
 
   /* público */
   if (req.method === "POST" && path === "/pedido") {
-    if (!ALLOWED_ORIGINS.includes(req.headers.get("Origin") || "")) return json(req, { error: "origem" }, 403);
+    if (!origens(req).includes(req.headers.get("Origin") || "")) return json(req, { error: "origem" }, 403);
     let p; try { p = montarPedido(await req.json()); } catch (e) { return json(req, { error: e.message }, 400); }
     const ip = await hashIp(req);
     const n = await env.DB.prepare("SELECT COUNT(*) AS n FROM pedidos WHERE ip = ? AND criado_em > ?")
