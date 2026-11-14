@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#6C1603">
+<title>Painel · Balcão</title>
+<link rel="icon" href="../img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F3EDE3;--bg-2:#EAE1D3;--card:#FBF8F3;--white:#fff;--ink:#1E1611;--muted:#6E6259;--line:rgba(30,22,17,.12);--line-2:rgba(30,22,17,.22);
+--wine:#6C1603;--wine-2:#86240E;--green:#2F6B45;--green-soft:#E3EFE6;--amber:#B7791F;--amber-soft:#FBEED7;--blue:#2D5A87;--blue-soft:#E2ECF6;--red:#A3361F;--red-soft:#F6E1DA;
+--serif:"Instrument Serif",Georgia,serif;--sans:"Inter",system-ui,-apple-system,sans-serif;--ease:cubic-bezier(.23,1,.32,1)}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--wine);outline-offset:2px;border-radius:6px}
+[hidden]{display:none!important}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:0;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;white-space:nowrap;transition:background-color .15s ease,box-shadow .15s ease,transform .1s var(--ease)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:default}
+.b-wine{background:var(--wine);color:#fff}@media(hover:hover){.b-wine:hover{background:var(--wine-2)}}
+.b-green{background:var(--green);color:#fff}
+.b-line{background:var(--white);box-shadow:inset 0 0 0 1px var(--line-2)}@media(hover:hover){.b-line:hover{box-shadow:inset 0 0 0 1px var(--ink)}}
+.b-ghost{background:transparent;color:var(--muted)}
+.b-wa{background:#1F8F4E;color:#fff}
+.b-sm{min-height:38px;padding:0 12px;font-size:13px}
+input.in{width:100%;height:48px;padding:0 14px;border-radius:8px;border:1px solid var(--line-2);background:var(--white);font-size:16px}
+input.in:focus{outline:none;border-color:var(--wine);box-shadow:0 0 0 3px rgba(108,22,3,.12)}
+
+/* login */
+.login{min-height:100svh;display:grid;place-items:center;padding:24px}
+.login form{width:min(400px,100%);background:var(--card);border-radius:16px;padding:30px;box-shadow:0 0 0 1px var(--line),0 30px 60px -30px rgba(30,22,17,.4);display:grid;gap:14px}
+.login h1{margin:0;font:400 34px/1.1 var(--serif)}
+.login p{margin:0;color:var(--muted);font-size:14px}
+.login label{display:grid;gap:6px;font-size:13px;font-weight:500;color:var(--muted)}
+.login .chk{display:flex;gap:10px;align-items:center;font-size:14px;color:var(--ink)}
+.login .chk input{width:20px;height:20px;accent-color:var(--wine)}
+.err{color:var(--red);font-size:13.5px;min-height:1em;margin:0}
+.demo-link{text-align:center;font-size:13.5px}
+.demo-link a{color:var(--wine)}
+
+/* app */
+header{position:sticky;top:0;z-index:10;background:var(--wine);color:#fff}
+.top{display:flex;align-items:center;gap:14px;height:58px;padding:0 16px}
+.top b{font:400 26px/1 var(--serif)}
+.top small{opacity:.75;font-size:12.5px}
+.live{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12.5px;opacity:.9}
+.live i{width:8px;height:8px;border-radius:50%;background:#7BD99A;box-shadow:0 0 0 3px rgba(123,217,154,.25)}
+.live.off i{background:#F0A08A;box-shadow:0 0 0 3px rgba(240,160,138,.25)}
+.top .out{background:rgba(255,255,255,.14);color:#fff;min-height:36px}
+.tabs{display:flex;gap:4px;padding:0 10px;overflow-x:auto}
+.tabs button{position:relative;min-height:46px;padding:0 14px;border:0;background:none;color:rgba(255,255,255,.75);font-weight:600;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected=true]{color:#fff}
+.tabs button[aria-selected=true]::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:#fff}
+.tabs .n{display:inline-grid;place-items:center;min-width:20px;height:20px;margin-left:6px;padding:0 6px;border-radius:10px;background:#fff;color:var(--wine);font-size:12px;font-variant-numeric:tabular-nums}
+.demo-bar{background:var(--amber-soft);color:#6B4510;text-align:center;font-size:13px;padding:8px 12px}
+main{padding:18px 16px 60px;max-width:1400px;margin:0 auto}
+
+/* pedidos */
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:16px}
+.seg{display:inline-flex;padding:4px;border-radius:10px;background:var(--bg-2)}
+.seg button{min-height:38px;padding:0 14px;border:0;border-radius:8px;background:none;font-weight:600;font-size:13.5px;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--white);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.sum{font-size:13.5px;color:var(--muted)}
+.sum b{color:var(--ink);font-variant-numeric:tabular-nums}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+.col h2{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.col h2 i{width:9px;height:9px;border-radius:50%}
+.col .list{display:grid;gap:10px}
+.list.flat{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.empty{padding:22px;border-radius:12px;border:1.5px dashed var(--line-2);text-align:center;color:var(--muted);font-size:14px}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+.ord{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 0 0 1px var(--line);display:grid;gap:10px}
+.ord.fresh{box-shadow:0 0 0 2px var(--wine),0 10px 30px -14px rgba(108,22,3,.5);animation:pop .5s var(--ease)}
+@keyframes pop{from{transform:scale(.97);opacity:.5}to{transform:none;opacity:1}}
+.ord-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.ord-h b{font-size:16px}
+.ord-h small{display:block;color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums}
+.st{flex:none;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.st.novo{background:var(--red-soft);color:var(--red)}.st.preparo{background:var(--amber-soft);color:var(--amber)}.st.pronto{background:var(--blue-soft);color:var(--blue)}
+.st.retirado{background:var(--green-soft);color:var(--green)}.st.cancelado{background:var(--bg-2);color:var(--muted)}
+.items{margin:0;padding:0;list-style:none;display:grid;gap:4px}
+.items li{display:flex;justify-content:space-between;gap:10px;font-size:14.5px}
+.items li span{font-weight:600}
+.items li em{display:block;font-style:normal;font-size:12.5px;color:var(--wine)}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+.meta span{padding:3px 9px;border-radius:6px;background:var(--bg-2);font-size:12.5px}
+.meta .pickup{background:var(--ink);color:#fff;font-weight:600}
+.meta .fid{background:var(--green-soft);color:var(--green);font-weight:600}
+.obs{margin:0;padding:8px 10px;border-radius:8px;background:var(--amber-soft);color:#6B4510;font-size:13px}
+.ord-f{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ord-f .total{margin-right:auto;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* selos */
+.wrap2{max-width:760px;margin:0 auto}
+.search{display:flex;gap:8px;margin-bottom:18px}
+.card{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 0 0 1px var(--line)}
+.client-h{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start;margin-bottom:16px}
+.client-h h2{margin:0;font:400 30px/1.1 var(--serif)}
+.client-h small{color:var(--muted);font-variant-numeric:tabular-nums}
+.stamps{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;max-width:420px;margin:0 0 14px}
+.stamps i{aspect-ratio:1;border-radius:50%;border:2px dashed var(--line-2);display:grid;place-items:center;font-style:normal;color:transparent;font-weight:700}
+.stamps i.on{border:0;background:var(--wine);color:#fff}
+.stamps i.on::after{content:"✓"}
+.count{font-size:15px;margin:0 0 16px}
+.count b{font-size:22px;font-variant-numeric:tabular-nums}
+.full{padding:12px 14px;border-radius:10px;background:var(--green-soft);color:var(--green);font-weight:600;margin-bottom:14px}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.hist{margin:20px 0 0;padding:0;list-style:none;font-size:13.5px}
+.hist li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.hist .d{font-weight:700;font-variant-numeric:tabular-nums}
+.hist .d.neg{color:var(--red)}.hist .d.pos{color:var(--green)}
+.rank{margin:0;padding:0;list-style:none}
+.rank li button{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;width:100%;padding:12px 14px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;cursor:pointer}
+@media(hover:hover){.rank li button:hover{background:var(--card)}}
+.rank small{display:block;color:var(--muted);font-variant-numeric:tabular-nums}
+.mini{display:flex;gap:3px}
+.mini i{width:9px;height:9px;border-radius:50%;background:var(--line-2)}
+.mini i.on{background:var(--wine)}
+.toast{position:fixed;left:50%;bottom:22px;translate:-50% 0;z-index:30;padding:11px 16px;border-radius:10px;background:var(--ink);color:#fff;font-size:14px;opacity:0;transform:translateY(8px);transition:opacity .2s ease,transform .2s var(--ease);pointer-events:none}
+.toast.show{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<section class="login" id="login">
+  <form id="loginForm" novalidate>
+    <h1>Painel da Balcão</h1>
+    <p>Pedidos e cartão fidelidade. Acesso só para a equipe.</p>
+    <label id="apiWrap">Endereço do servidor<input class="in" name="api" inputmode="url" autocomplete="off" placeholder="https://painel-balcao.sua-conta.workers.dev"></label>
+    <label>Senha<input class="in" name="key" type="password" autocomplete="current-password"></label>
+    <label class="chk"><input type="checkbox" name="remember">Lembrar neste aparelho</label>
+    <p class="err" id="loginErr" role="alert"></p>
+    <button class="btn b-wine" type="submit">Entrar</button>
+    <p class="demo-link">Ainda sem servidor? <a href="?demo=1">Ver o painel em modo demonstração</a></p>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <header>
+    <div class="top"><b>Balcão</b><small>Painel</small><span class="live" id="live"><i></i><span id="liveTxt">ao vivo</span></span><button class="btn b-sm out" type="button" id="logout">Sair</button></div>
+    <nav class="tabs" role="tablist">
+      <button type="button" role="tab" data-tab="pedidos" aria-selected="true">Pedidos<span class="n" id="nOpen" hidden>0</span></button>
+      <button type="button" role="tab" data-tab="selos" aria-selected="false">Selos</button>
+      <button type="button" role="tab" data-tab="clientes" aria-selected="false">Clientes</button>
+    </nav>
+  </header>
+  <div class="demo-bar" id="demoBar" hidden>Modo demonstração: dados de exemplo, nada é salvo. Um pedido novo chega a cada 40 segundos.</div>
+  <main>
+    <section id="t-pedidos">
+      <div class="bar">
+        <div class="seg" role="group" aria-label="Filtro"><button type="button" data-f="abertos" aria-pressed="true">Em andamento</button><button type="button" data-f="hoje" aria-pressed="false">Hoje</button><button type="button" data-f="todos" aria-pressed="false">Todos</button></div>
+        <span class="sum" id="sum"></span>
+      </div>
+      <div id="orders"></div>
+    </section>
+    <section id="t-selos" hidden>
+      <div class="wrap2">
+        <form class="search" id="telForm"><input class="in" name="tel" inputmode="tel" autocomplete="off" placeholder="Celular com DDD, ex.: 41 99999-9999" aria-label="Celular do cliente"><button class="btn b-wine" type="submit">Buscar</button></form>
+        <div id="client"><div class="empty">Digite o celular do cliente para ver, dar ou resgatar selos.</div></div>
+      </div>
+    </section>
+    <section id="t-clientes" hidden>
+      <div class="wrap2"><div class="card" style="padding:6px 0"><ul class="rank" id="rank"></ul></div></div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* Endereço do servidor do painel (pasta painel-api). Pode deixar vazio e digitar na tela de login. */
+const API_PADRAO = "";
+const META = 10, PREMIO = "1 pizza grátis";
+
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const brl = c => (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const telFmt = t => t ? `(${t.slice(0,2)}) ${t.slice(2,t.length-4)}-${t.slice(-4)}` : "";
+const normTel = v => { let d = String(v||"").replace(/\D/g,""); if (d.length > 11 && d.startsWith("55")) d = d.slice(2); return /^[1-9]{2}9?\d{8}$/.test(d) ? d : ""; };
+const hora = iso => new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
+const dia = iso => new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", timeZone: "America/Sao_Paulo" });
+const STATUS_TXT = { novo: "Novo", preparo: "Em preparo", pronto: "Pronto", retirado: "Retirado", cancelado: "Cancelado" };
+const NEXT = { novo: ["preparo", "Começar preparo"], preparo: ["pronto", "Marcar pronto"], pronto: ["retirado", "Cliente retirou"] };
+function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove("show"),2200); }
+
+/* ---------- acesso ---------- */
+const DEMO = new URLSearchParams(location.search).get("demo") === "1";
+const S = { api: "", key: "" };
+function loadCreds(){ for (const st of [sessionStorage, localStorage]) { try { const c = JSON.parse(st.getItem("balcao-painel") || "null"); if (c) return c; } catch(e){} } return null; }
+
+/* ---------- servidor (ou demonstração) ---------- */
+async function call(method, path, body){
+  if (DEMO) return demo(method, path, body);
+  const r = await fetch(S.api + path, { method, headers: { "Authorization": "Bearer " + S.key, ...(body ? { "Content-Type": "application/json" } : {}) }, body: body ? JSON.stringify(body) : undefined });
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401) { logout(); throw new Error("Senha incorreta ou sessão expirada."); }
+  if (!r.ok) throw new Error(j.error || "Erro no servidor");
+  return j;
+}
+
+/* ---------- pedidos ---------- */
+let filtro = "abertos", conhecidos = null, ultimos = [];
+async function loadOrders(silent){
+  try {
+    const { pedidos } = await call("GET", "/admin/pedidos?status=" + filtro);
+    setLive(true);
+    const novos = conhecidos ? pedidos.filter(p => !conhecidos.has(p.id) && p.status === "novo") : [];
+    if (filtro === "abertos" || !conhecidos) conhecidos = new Set([...(conhecidos || []), ...pedidos.map(p => p.id)]);
+    if (novos.length) { beep(); toast(novos.length === 1 ? `Pedido novo: ${novos[0].nome}` : `${novos.length} pedidos novos`); }
+    ultimos = pedidos; renderOrders(new Set(novos.map(p => p.id)));
+  } catch (e) { setLive(false); if (!silent) toast(e.message); }
+}
+function orderCard(p, fresh){
+  const nx = NEXT[p.status], qtd = p.itens.reduce((s,i)=>s+i.qtd,0);
+  const waMsg = `Olá, ${p.nome}! Seu pedido ${p.id} da Balcão está pronto para retirar 🍕`;
+  return `<article class="ord ${fresh ? "fresh" : ""}" data-id="${p.id}">
+    <div class="ord-h"><div><b>${esc(p.nome)}</b><small>${p.id} · ${dia(p.criado_em)} ${hora(p.criado_em)} · ${qtd} pizza${qtd>1?"s":""}</small></div><span class="st ${p.status}">${STATUS_TXT[p.status]}</span></div>
+    <ul class="items">${p.itens.map(i => `<li><div><span>${i.qtd}×</span> ${esc(i.nome)}${i.obs ? `<em>${esc(i.obs)}</em>` : ""}</div></li>`).join("")}</ul>
+    <div class="meta"><span class="pickup">Retirada: ${esc(p.retirada || "o quanto antes")}</span>${p.pagamento ? `<span>${esc(p.pagamento)}</span>` : ""}${p.fid && p.tel ? `<span class="fid">Selo · ${telFmt(p.tel)}</span>` : ""}</div>
+    ${p.obs ? `<p class="obs">${esc(p.obs)}</p>` : ""}
+    <div class="ord-f"><span class="total">${brl(p.total)}</span>
+      ${p.status === "pronto" && p.tel ? `<a class="btn b-wa b-sm" target="_blank" rel="noopener" href="https://wa.me/55${p.tel}?text=${encodeURIComponent(waMsg)}">Avisar</a>` : ""}
+      ${nx ? `<button class="btn b-sm ${nx[0]==="retirado"?"b-green":"b-wine"}" type="button" data-st="${nx[0]}">${nx[1]}</button>` : ""}
+      ${["novo","preparo","pronto"].includes(p.status) ? `<button class="btn b-ghost b-sm" type="button" data-st="cancelado">Cancelar</button>` : ""}
+      ${["retirado","cancelado"].includes(p.status) ? `<button class="btn b-line b-sm" type="button" data-st="pronto">Desfazer</button>` : ""}
+    </div></article>`;
+}
+function renderOrders(fresh = new Set()){
+  const open = ultimos.filter(p => ["novo","preparo","pronto"].includes(p.status));
+  $("#nOpen").hidden = !open.length && filtro === "abertos"; $("#nOpen").textContent = open.length;
+  document.title = (open.filter(p=>p.status==="novo").length ? `(${open.filter(p=>p.status==="novo").length}) ` : "") + "Painel · Balcão";
+  const fat = ultimos.filter(p => p.status !== "cancelado").reduce((s,p)=>s+p.total,0);
+  $("#sum").innerHTML = `<b>${ultimos.length}</b> pedido${ultimos.length===1?"":"s"} · <b>${brl(fat)}</b>`;
+  if (filtro === "abertos") {
+    const cols = [["novo","Novos","var(--red)"],["preparo","Em preparo","var(--amber)"],["pronto","Prontos para retirar","var(--blue)"]];
+    $("#orders").innerHTML = `<div class="cols">${cols.map(([st,t,c]) => { const l = ultimos.filter(p=>p.status===st);
+      return `<div class="col"><h2><i style="background:${c}"></i>${t} · ${l.length}</h2><div class="list">${l.length ? l.map(p=>orderCard(p,fresh.has(p.id))).join("") : `<div class="empty">Nada por aqui.</div>`}</div></div>`; }).join("")}</div>`;
+  } else {
+    $("#orders").innerHTML = ultimos.length ? `<div class="list flat">${ultimos.map(p=>orderCard(p,false)).join("")}</div>` : `<div class="empty">Nenhum pedido.</div>`;
+  }
+}
+$("#orders").addEventListener("click", async e => {
+  const b = e.target.closest("[data-st]"); if (!b) return;
+  const id = b.closest("[data-id]").dataset.id, st = b.dataset.st;
+  if (st === "cancelado" && !confirm("Cancelar este pedido?")) return;
+  b.disabled = true;
+  try {
+    const r = await call("POST", "/admin/pedido/status", { id, status: st });
+    toast(r.selo === "+1" ? `Retirado · selo marcado (${r.selos % META || (r.selos ? META : 0)}/${META})` : r.selo === "removido" ? "Desfeito · selo do pedido removido" : STATUS_TXT[st]);
+    await loadOrders(true);
+  } catch (err) { toast(err.message); b.disabled = false; }
+});
+$$(".seg button").forEach(b => b.addEventListener("click", () => { filtro = b.dataset.f; $$(".seg button").forEach(x => x.setAttribute("aria-pressed", x === b)); loadOrders(); }));
+
+/* aviso sonoro de pedido novo (só toca depois do primeiro toque na tela, regra do navegador) */
+let ac = null; addEventListener("pointerdown", () => { if (!ac) try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} }, { once: true });
+function beep(){ if (!ac) return; [0, .18].forEach(t => { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = 880; g.gain.setValueAtTime(.0001, ac.currentTime + t); g.gain.exponentialRampToValueAtTime(.25, ac.currentTime + t + .02); g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + t + .15); o.connect(g).connect(ac.destination); o.start(ac.currentTime + t); o.stop(ac.currentTime + t + .16); }); }
+function setLive(on){ $("#live").classList.toggle("off", !on); $("#liveTxt").textContent = on ? "ao vivo" : "sem conexão"; }
+
+/* ---------- selos ---------- */
+let atual = null;
+async function openClient(tel){
+  tel = normTel(tel); if (!tel) return toast("Celular inválido. Use DDD + número.");
+  $("#telForm").tel.value = telFmt(tel);
+  try { atual = await call("GET", "/admin/cliente?tel=" + tel); renderClient(); } catch (e) { toast(e.message); }
+}
+function renderClient(){
+  const c = atual, cheios = Math.floor(c.selos / META), noCartao = c.selos >= META ? META : c.selos % META;
+  const msg = c.selos >= META ? `Olá${c.nome?`, ${c.nome}`:""}! Seu cartão fidelidade da Balcão está completo: ${PREMIO} te esperando 🍕` : `Olá${c.nome?`, ${c.nome}`:""}! Você tem ${c.selos} de ${META} selos no cartão fidelidade da Balcão. Faltam ${META - c.selos} para ${PREMIO} 🍕`;
+  $("#client").innerHTML = `<div class="card">
+    <div class="client-h"><div><h2>${esc(c.nome || "Cliente")}</h2><small>${telFmt(c.tel)}</small></div><a class="btn b-wa b-sm" target="_blank" rel="noopener" href="https://wa.me/55${c.tel}?text=${encodeURIComponent(msg)}">Mandar saldo no WhatsApp</a></div>
+    <div class="stamps" aria-label="${noCartao} de ${META} selos">${Array.from({length:META},(_,i)=>`<i class="${i<noCartao?"on":""}"></i>`).join("")}</div>
+    <p class="count"><b>${c.selos}</b> selo${c.selos===1?"":"s"}${cheios>1?` · ${cheios} cartões cheios`:""}</p>
+    ${c.podeResgatar ? `<div class="full">🎉 Cartão completo: ${PREMIO}!</div>` : ""}
+    <div class="acts">
+      <button class="btn b-wine" type="button" data-sel="1">+1 selo</button>
+      <button class="btn b-line" type="button" data-sel="-1" ${c.selos?"":"disabled"}>−1 selo</button>
+      <button class="btn b-green" type="button" data-resg ${c.podeResgatar?"":"disabled"}>Resgatar ${esc(PREMIO)}</button>
+    </div>
+    ${c.historico.length ? `<ul class="hist">${c.historico.map(h=>`<li><span>${dia(h.criado_em)} ${hora(h.criado_em)} · ${esc(h.motivo||"")}${h.pedido_id?` · ${h.pedido_id}`:""}</span><span class="d ${h.delta<0?"neg":"pos"}">${h.delta>0?"+":""}${h.delta}</span></li>`).join("")}</ul>` : `<p class="sum" style="margin-top:16px">Ainda sem movimentos.</p>`}
+  </div>`;
+}
+$("#client").addEventListener("click", async e => {
+  const s = e.target.closest("[data-sel]"), r = e.target.closest("[data-resg]"); if (!s && !r) return;
+  try {
+    if (s) await call("POST", "/admin/selo", { tel: atual.tel, delta: +s.dataset.sel });
+    if (r) { if (!confirm(`Confirmar o resgate de ${PREMIO}? Isso desconta ${META} selos.`)) return; await call("POST", "/admin/resgate", { tel: atual.tel }); toast("Prêmio resgatado!"); }
+    await openClient(atual.tel);
+  } catch (err) { toast(err.message); }
+});
+$("#telForm").addEventListener("submit", e => { e.preventDefault(); openClient(e.target.tel.value); });
+
+/* ---------- clientes ---------- */
+async function loadRank(){
+  try { const { clientes } = await call("GET", "/admin/clientes");
+    $("#rank").innerHTML = clientes.length ? clientes.map(c => `<li><button type="button" data-tel="${c.tel}"><div><b>${esc(c.nome || "Cliente")}</b><small>${telFmt(c.tel)} · último selo ${dia(c.ultimo)}</small></div><div><div class="mini">${Array.from({length:META},(_,i)=>`<i class="${i<Math.min(c.selos,META)?"on":""}"></i>`).join("")}</div><small style="text-align:right">${c.selos}/${META}</small></div></button></li>`).join("")
+      : `<li class="empty" style="margin:14px">Nenhum cliente com selos ainda.</li>`;
+  } catch (e) { toast(e.message); }
+}
+$("#rank").addEventListener("click", e => { const b = e.target.closest("[data-tel]"); if (b) { tab("selos"); openClient(b.dataset.tel); } });
+
+/* ---------- abas, entrar e sair ---------- */
+function tab(t){ $$(".tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t)); ["pedidos","selos","clientes"].forEach(x => $("#t-"+x).hidden = x !== t); if (t === "clientes") loadRank(); if (t === "pedidos") loadOrders(true); }
+$$(".tabs button").forEach(b => b.addEventListener("click", () => tab(b.dataset.tab)));
+let timer = null;
+function start(){
+  $("#login").hidden = true; $("#app").hidden = false; $("#demoBar").hidden = !DEMO;
+  loadOrders(); clearInterval(timer); timer = setInterval(() => { if (!document.hidden) loadOrders(true); }, DEMO ? 5000 : 20000);
+}
+function logout(){ sessionStorage.removeItem("balcao-painel"); localStorage.removeItem("balcao-painel"); clearInterval(timer); $("#app").hidden = true; $("#login").hidden = false; }
+$("#logout").addEventListener("click", () => { if (DEMO) { location.href = location.pathname; return; } logout(); });
+$("#loginForm").addEventListener("submit", async e => {
+  e.preventDefault(); const f = e.target, err = $("#loginErr"); err.textContent = "";
+  S.api = (f.api.value.trim() || API_PADRAO).replace(/\/$/, ""); S.key = f.key.value;
+  if (!/^https:\/\//.test(S.api)) return err.textContent = "Digite o endereço do servidor (começa com https://).";
+  if (S.key.length < 8) return err.textContent = "Digite a senha.";
+  try {
+    const r = await fetch(S.api + "/admin/pedidos?status=abertos", { headers: { Authorization: "Bearer " + S.key } });
+    if (r.status === 401) return err.textContent = "Senha incorreta.";
+    if (!r.ok) throw 0;
+  } catch (x) { return err.textContent = "Não consegui falar com o servidor. Confira o endereço."; }
+  (f.remember.checked ? localStorage : sessionStorage).setItem("balcao-painel", JSON.stringify(S));
+  start();
+});
+if (API_PADRAO) $("#apiWrap").hidden = true;
+if (DEMO) start(); else { const c = loadCreds(); if (c) { Object.assign(S, c); start(); } }
+
+/* ---------- modo demonstração (dados de exemplo no próprio navegador) ---------- */
+function demo(method, path, body){
+  const D = demo.db || (demo.db = (() => {
+    const P = { margherita:["Margherita",4790], mussarela:["Mussarela",4490], calabresa:["Calabresa com Cebola",4490], diavola:["Diavola",4990], gorgonzola:["Gorgonzola & Cogumelo",4990], "tres-queijos":["Três Queijos",4490] };
+    const ago = m => new Date(Date.now() - m * 60000).toISOString(); let n = 0;
+    const mk = (nome, tel, its, st, min, extra = {}) => { const itens = its.map(([id,q,obs]) => ({ id, nome:P[id][0], qtd:q, centavos:P[id][1], obs:obs||"" }));
+      return { id:`B1411-19${String(30+n).padStart(2,"0")}-D${String(++n).padStart(3,"0")}`, nome, tel, fid:!!tel, itens, total:itens.reduce((s,i)=>s+i.qtd*i.centavos,0), retirada:extra.ret||"o quanto antes", pagamento:extra.pag||"Pix", obs:extra.obs||"", status:st, criado_em:ago(min) }; };
+    const pedidos = [
+      mk("Ana", "41999910001", [["margherita",2,"sem manjericão"]], "novo", 2, { ret:"20:00" }),
+      mk("Carlos", "41999910002", [["diavola",1],["calabresa",1]], "novo", 4, { pag:"Cartão" }),
+      mk("Júlia", "", [["mussarela",1]], "preparo", 11, { ret:"19:45", pag:"Dinheiro", obs:"Troco para R$ 100" }),
+      mk("Rafael", "41999910004", [["gorgonzola",2],["tres-queijos",1]], "pronto", 23),
+      mk("Marina", "41999910005", [["margherita",1]], "retirado", 70),
+    ];
+    const selos = [];
+    const add = (tel, d, motivo, pid, min) => selos.push({ tel, delta:d, motivo, pedido_id:pid||null, criado_em:ago(min) });
+    for (let i = 0; i < 9; i++) add("41999910001", 1, "pedido retirado", "OLD"+i, 60*24*(30-i));
+    for (let i = 0; i < 4; i++) add("41999910004", 1, "pedido retirado", "OLD1"+i, 60*24*(20-i));
+    for (let i = 0; i < 10; i++) add("41999910005", 1, i < 9 ? "pedido retirado" : "pedido retirado", i < 9 ? "OLD2"+i : pedidos[4].id, 60*24*(25-i));
+    let extra = 0; setInterval(() => { if (pedidos.length < 14) pedidos.push(mk(["Pedro","Luiza","Bruno","Camila"][extra++ % 4], "4199991100"+(extra%10), [["margherita",1],["calabresa",1]], "novo", 0)); }, 40000);
+    return { pedidos, selos, P, add };
+  })());
+  const sum = tel => D.selos.filter(s => s.tel === tel).reduce((a,s)=>a+s.delta,0);
+  const u = new URL("https://x" + path), p = u.pathname;
+  const out = o => Promise.resolve(JSON.parse(JSON.stringify(o)));
+  if (p === "/admin/pedidos") { const f = u.searchParams.get("status");
+    let l = f === "abertos" ? D.pedidos.filter(x => ["novo","preparo","pronto"].includes(x.status)) : D.pedidos.slice();
+    l.sort((a,b) => f === "abertos" ? a.criado_em.localeCompare(b.criado_em) : b.criado_em.localeCompare(a.criado_em)); return out({ pedidos:l }); }
+  if (p === "/admin/pedido/status") { const o = D.pedidos.find(x => x.id === body.id); const antes = o.status; o.status = body.status; let selo = null;
+    if (o.fid && o.tel) { if (body.status === "retirado" && !D.selos.some(s => s.pedido_id === o.id)) { D.add(o.tel, 1, "pedido retirado", o.id, 0); selo = "+1"; }
+      else if (antes === "retirado" && body.status !== "retirado") { D.selos = D.selos.filter(s => s.pedido_id !== o.id); selo = "removido"; } }
+    return out({ ok:true, selo, selos: o.tel ? sum(o.tel) : null }); }
+  if (p === "/admin/cliente") { const tel = u.searchParams.get("tel"), s = sum(tel), peds = D.pedidos.filter(x => x.tel === tel);
+    return out({ tel, selos:s, meta:META, podeResgatar:s>=META, nome: peds[0] ? peds[0].nome : "", pedidos:peds, historico: D.selos.filter(x => x.tel === tel).sort((a,b)=>b.criado_em.localeCompare(a.criado_em)) }); }
+  if (p === "/admin/selo") { if (body.delta < 0 && sum(body.tel) <= 0) return Promise.reject(new Error("sem selos")); D.add(body.tel, body.delta, body.delta > 0 ? "selo manual" : "correção", null, 0); return out({ ok:true, selos:sum(body.tel) }); }
+  if (p === "/admin/resgate") { if (sum(body.tel) < META) return Promise.reject(new Error("cartão ainda não está cheio")); D.add(body.tel, -META, "prêmio resgatado", null, 0); return out({ ok:true, selos:sum(body.tel) }); }
+  if (p === "/admin/clientes") { const tels = [...new Set(D.selos.map(s => s.tel))];
+    return out({ meta:META, clientes: tels.map(t => ({ tel:t, selos:sum(t), ultimo:D.selos.filter(s=>s.tel===t).map(s=>s.criado_em).sort().pop(), nome:(D.pedidos.find(x=>x.tel===t)||{}).nome||"" })).filter(c=>c.selos>0).sort((a,b)=>b.selos-a.selos) }); }
+  return Promise.reject(new Error("não encontrado"));
+}
+</script>
+</body>
+</html>

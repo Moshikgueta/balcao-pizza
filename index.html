@@ -323,7 +323,7 @@ footer a{text-decoration:none}
 @media (max-width:900px){.idea{grid-template-columns:minmax(0,1fr);gap:32px}.idea form{padding:22px}}
 
 .paynow{display:grid;gap:10px;margin-bottom:12px;padding:14px;border-radius:8px;background:#EAF3EC;color:#1F4D30;font-size:14px}
-.paynow[hidden]{display:none}
+.paynow[hidden],.form [hidden]{display:none}
 .paynow p{margin:0}
 .paynow .btn{width:100%}
 .form label{display:grid;gap:6px;font-size:13px;font-weight:500;color:var(--muted)}
@@ -560,6 +560,7 @@ footer a{text-decoration:none}
       <label><span id="payLbl">Pagamento na retirada</span><select name="pagamento"><option>Pix</option><option>Cartão</option><option>Dinheiro</option></select></label>
       <label>Observações gerais<textarea name="obs" rows="2" placeholder="Ex.: troco para R$ 100"></textarea></label>
       <label class="fid-check"><input type="checkbox" name="fid" checked><span>Marcar selo no cartão fidelidade<small id="fidHint"></small></span></label>
+      <label id="telWrap" hidden>Seu celular (para o selo)<input name="tel" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="(41) 99999-9999"></label>
     </form>
   </div>
   <div class="dfoot">
@@ -589,6 +590,8 @@ const CONFIG = {
   // CARTÃO FIDELIDADE (confirmar as regras com a Balcão)
   loyaltyGoal: 10,                       // pedidos para ganhar
   loyaltyPrize: "1 pizza grátis",        // o que ganha
+  // PAINEL DE PEDIDOS E SELOS (pasta painel-api). Endereço do servidor; vazio = desligado (pedido só no WhatsApp).
+  panelApi: "",
   // PAGAMENTO ONLINE (desligado). Veja PAGAMENTO.md para ligar.
   // mode "link": um link de pagamento pronto (Mercado Pago, InfinitePay, PagSeguro, Stripe...).
   //   No url, use {total} (ex.: 89.80), {centavos} (8980), {pedido} (código do pedido) e {nome}.
@@ -829,24 +832,37 @@ $("#send").onclick = () => {
   if(!q) return err.textContent="Adicione pelo menos uma pizza.";
   if(sum<CONFIG.minOrder) return err.textContent="Pedido mínimo de "+brl(CONFIG.minOrder)+".";
   if(!nome){ err.textContent="Digite seu nome."; return f.nome.focus(); }
+  const panel = !!CONFIG.panelApi, tel = panel && f.fid.checked ? telDigits(f.tel.value) : "";
+  if(panel && f.fid.checked && !tel){ err.textContent="Digite o celular com DDD para marcar o selo."; return f.tel.focus(); }
+  const online = PAY.on && f.pagamento.value === PAY.opt;
+  const id = (panel || online) ? orderId() : null;
   const lines = cart.map(l=>{ const p=byId(l.id); return `• ${l.qty}x ${p.name} — ${brl(l.qty*p.price)}${l.note?`\n   _${l.note}_`:""}`; });
   const msg = [
     "*Pedido para retirada — Balcão Pizza Napoletana*", "",
+    id ? `*Pedido:* ${id}` : null,
     ...lines, "",
     `*Total:* ${brl(sum)}`,
     `*Nome:* ${nome}`,
     `*Retirada:* ${f.horario.value || "o quanto antes"}`,
-    `*Pagamento na retirada:* ${f.pagamento.value}`,
+    online ? `*Pagamento:* online` : `*Pagamento na retirada:* ${f.pagamento.value}`,
     f.obs.value.trim() ? `*Obs.:* ${f.obs.value.trim()}` : null,
-    f.fid.checked ? `*Cartão fidelidade:* marcar selo neste número` : null,
+    f.fid.checked ? (tel ? `*Cartão fidelidade:* marcar selo no ${telPretty(tel)}` : `*Cartão fidelidade:* marcar selo neste número`) : null,
     "", "Pedido feito pelo site."
   ].filter(l=>l!==null).join("\n");
-  const online = PAY.on && f.pagamento.value === PAY.opt;
-  const order = online ? { id: orderId(), total: sum, nome, itens: cart.map(l=>({id:l.id, nome:byId(l.id).name, qtd:l.qty, preco:byId(l.id).price, obs:l.note||""})), retirada: f.horario.value || "o quanto antes" } : null;
-  const finalMsg = online ? msg.replace(`*Pagamento na retirada:* ${f.pagamento.value}`, `*Pagamento:* online · pedido ${order.id}`) : msg;
-  window.open(waBase+"?text="+encodeURIComponent(finalMsg),"_blank","noopener");
+  const order = { id, total: sum, nome, tel, fid: f.fid.checked, pagamento: online ? "Online" : f.pagamento.value, obs: f.obs.value.trim(),
+    itens: cart.map(l=>({id:l.id, nome:byId(l.id).name, qtd:l.qty, preco:byId(l.id).price, obs:l.note||""})), retirada: f.horario.value || "o quanto antes" };
+  window.open(waBase+"?text="+encodeURIComponent(msg),"_blank","noopener");
+  if(panel){ try{ fetch(CONFIG.panelApi.replace(/\/$/,"")+"/pedido",{method:"POST",keepalive:true,headers:{"Content-Type":"application/json"},body:JSON.stringify(order)}).catch(()=>{}); }catch(e){} }
   if(online){ PAY.pending = order; $("#payBtn").textContent = `Pagar ${brl(sum)} agora`; $("#payNow").hidden = false; }
 };
+function telDigits(v){ let d=String(v||"").replace(/\D/g,""); if(d.length>11&&d.startsWith("55")) d=d.slice(2); return /^[1-9]{2}9?\d{8}$/.test(d)?d:""; }
+function telPretty(t){ return `(${t.slice(0,2)}) ${t.slice(2,t.length-4)}-${t.slice(-4)}`; }
+if(CONFIG.panelApi){
+  const f=$("#form"), sync=()=>{ $("#telWrap").hidden=!f.fid.checked; };
+  f.fid.addEventListener("change",sync); sync();
+  try{ const t=localStorage.getItem("balcao-tel"); if(t) f.tel.value=t; }catch(e){}
+  f.tel.addEventListener("change",()=>{ try{ const d=telDigits(f.tel.value); if(d) localStorage.setItem("balcao-tel",telPretty(d)); }catch(e){} });
+}
 
 /* ---------- pagamento online (desligado até CONFIG.payment.enabled = true) ---------- */
 const PAY = { on: !!(CONFIG.payment && CONFIG.payment.enabled && CONFIG.payment.url), opt: "Online agora", pending: null };
