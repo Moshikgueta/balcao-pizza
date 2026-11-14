@@ -593,11 +593,13 @@ const CONFIG = {
   // mode "link": um link de pagamento pronto (Mercado Pago, InfinitePay, PagSeguro, Stripe...).
   //   No url, use {total} (ex.: 89.80), {centavos} (8980), {pedido} (código do pedido) e {nome}.
   // mode "checkout": o site manda o pedido para um servidor seu (url), que responde {"url":"..."} com a página de pagamento.
+  // STONE: "link" = link de pagamento do app Stone · "checkout" = Pagar.me (API da Stone), servidor em pagamento-api/
   payment: {
     enabled: false,
-    mode: "link",                          // "link" ou "checkout"
+    provider: "stone",
+    mode: "checkout",                      // "link" ou "checkout"
     url: "",                               // link de pagamento ou endereço do servidor
-    label: "Pagar online agora (Pix ou cartão)",
+    label: "Pagar online agora (Pix ou cartão · Stone)",
     returnMessage: "Pagamento enviado! Assim que for confirmado, a Balcão começa a preparar o seu pedido."
   },
 };
@@ -848,7 +850,7 @@ $("#send").onclick = () => {
 
 /* ---------- pagamento online (desligado até CONFIG.payment.enabled = true) ---------- */
 const PAY = { on: !!(CONFIG.payment && CONFIG.payment.enabled && CONFIG.payment.url), opt: "Online agora", pending: null };
-function orderId(){ const d=new Date(), p=n=>String(n).padStart(2,"0"); return `B${p(d.getDate())}${p(d.getMonth()+1)}-${p(d.getHours())}${p(d.getMinutes())}-${Math.random().toString(36).slice(2,6).toUpperCase()}`; }
+function orderId(){ const d=new Date(), p=n=>String(n).padStart(2,"0"); return `B${p(d.getDate())}${p(d.getMonth()+1)}-${p(d.getHours())}${p(d.getMinutes())}-${(Math.random().toString(36).slice(2)+"0000").slice(0,4).toUpperCase()}`; }
 if(PAY.on){
   const sel=$("#form").pagamento, o=document.createElement("option");
   o.value=PAY.opt; o.textContent=CONFIG.payment.label; sel.prepend(o); sel.value=PAY.opt;

@@ -1,5 +1,7 @@
 # Pagamento online (pronto para ligar)
 
+> **Stone:** o site já vem configurado para a Stone (`provider: "stone"`). O passo a passo completo, com o servidor do Pagar.me (a plataforma online da Stone), está em [`pagamento-api/README.md`](pagamento-api/README.md).
+
 O site já tem o lugar para pagamento online, mas ele está **desligado**. Hoje o cliente paga na retirada (Pix, cartão ou dinheiro) e nada muda até você ligar.
 
 Quando ligar, aparece a opção **"Pagar online agora (Pix ou cartão)"** no pedido. O cliente envia o pedido no WhatsApp como sempre e, em seguida, aparece o botão **"Pagar R$ XX agora"**, que abre a página de pagamento.
