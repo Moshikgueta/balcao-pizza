@@ -32,7 +32,12 @@ j = await (await req("POST", "/admin/pedido/status", { id: p1.id, status: "pront
 await req("POST", "/admin/pedido/status", { id: p1.id, status: "retirado" }, K);
 for (let i = 0; i < 9; i++) await req("POST", "/admin/selo", { tel: "41 99991-9434", delta: 1 }, K);
 j = await (await req("GET", "/admin/cliente?tel=41999919434", null, K)).json(); ok(j.selos === 10 && j.podeResgatar && j.nome === "Ana", "10 selos: cartão cheio");
-r = await req("GET", "/selos?tel=41999919434"); ok(r.status === 404, "não há consulta pública de selos");
+j = await (await req("GET", "/selos?tel=(41) 99991-9434", null, { ip: "5.5.5.5" })).json();
+ok(j.selos === 10 && j.completo === true && j.meta === 10 && !("nome" in j) && !("historico" in j), "cliente consulta o próprio cartão (só a quantidade)");
+r = await req("GET", "/selos?tel=41999919434", null, { origin: "https://outro.com", ip: "5.5.5.5" }); ok(r.status === 403, "consulta só pelo site da Balcão");
+j = await (await req("GET", "/selos?tel=41988887777", null, { ip: "5.5.5.5" })).json(); ok(j.selos === 0 && j.completo === false, "número sem selos mostra zero (não revela se é cliente)");
+let barrado = 0; for (let i = 0; i < 10; i++) { r = await req("GET", "/selos?tel=41999919434", null, { ip: "5.5.5.5" }); if (r.status === 429) barrado++; }
+ok(barrado === 2, "máximo de 10 consultas por hora no mesmo aparelho (2 já usadas + 8 permitidas)");
 j = await (await req("POST", "/admin/resgate", { tel: "41999919434" }, K)).json(); ok(j.selos === 0, "resgate zera o cartão");
 r = await req("POST", "/admin/resgate", { tel: "41999919434" }, K); ok(r.status === 400, "não resgata cartão vazio");
 r = await req("POST", "/admin/selo", { tel: "41999919434", delta: -1 }, K); ok(r.status === 400, "não fica negativo");

@@ -273,7 +273,23 @@ footer a{text-decoration:none}
 .stamp.on svg{width:62%;height:62%}
 .stamp.free{border:1.5px solid #E7B26C;color:#E7B26C;font-weight:600;font-size:10.5px;text-align:center;line-height:1.1}
 .lcard-bot{display:flex;justify-content:space-between;font-size:13px;color:#E9C9A8}
-@media (max-width:900px){.loyal{grid-template-columns:1fr;gap:40px}.lcard{max-width:380px;padding:18px}.stamps{gap:8px}}
+.myst{margin-top:22px;display:grid;gap:8px;max-width:440px}
+.myst[hidden],#loyalAskWrap[hidden]{display:none}
+.myst label{font-size:14px;font-weight:600}
+.myst-row{display:flex;gap:8px}
+.myst-row input{flex:1;min-width:0;height:48px;padding:0 14px;border-radius:6px;border:1px solid var(--line);background:#fff;font:400 16px var(--sans);color:var(--ink)}
+.myst-row input:focus{outline:none;border-color:var(--wine);box-shadow:0 0 0 3px rgba(108,22,3,.12)}
+.myst-msg{margin:4px 0 0;min-height:1.4em;font-size:15px}
+.myst-msg b{font-variant-numeric:tabular-nums}
+.myst-msg.err{color:#A3361F}
+.myst-wa{font-size:13.5px;color:var(--muted)}
+.lcard.real{transform:rotate(0);transition:transform .5s var(--ease)}
+.stamp.on.pop{animation:stampIn .35s var(--ease) both}
+@keyframes stampIn{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.stamp.on.pop{animation:none}}
+.loyal>*{min-width:0}
+.myst-row input{width:100%}
+@media (max-width:900px){.loyal{grid-template-columns:minmax(0,1fr);gap:40px}.lcard{max-width:380px;padding:18px}.stamps{gap:8px}}
 .form .fid-check{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--ink);background:var(--card);border-radius:6px;padding:12px 14px;box-shadow:0 0 0 1px var(--line);cursor:pointer}
 .form .fid-check input{width:20px;height:20px;min-height:0;padding:0;margin:1px 0 0;border:0;accent-color:var(--wine);flex:none}
 .form .fid-check>span{font-weight:500;color:var(--ink)}
@@ -363,7 +379,7 @@ footer a{text-decoration:none}
     <nav aria-label="Seções">
       <a href="#cardapio">Cardápio</a>
       <a href="#massa">A massa</a>
-      <a href="#fidelidade">Fidelidade</a>
+      <a href="#fidelidade">Meus selos</a>
       <a href="#sugestao">Sugira um sabor</a>
       <a href="#retirada">Retirada</a>
     </nav>
@@ -436,12 +452,18 @@ footer a{text-decoration:none}
           <li>A gente marca um selo no seu número de celular.</li>
           <li id="loyalStep3"></li>
         </ol>
-        <div class="cta" style="margin-top:22px">
+        <div class="cta" style="margin-top:22px" id="loyalAskWrap">
           <a class="btn btn-wine" id="loyalAsk" href="#" target="_blank" rel="noopener">Consultar meus selos</a>
         </div>
+        <form class="myst" id="mySt" hidden novalidate>
+          <label for="myTel">Consulte os seus selos</label>
+          <div class="myst-row"><input id="myTel" name="tel" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="Seu celular com DDD"><button class="btn btn-wine" type="submit">Consultar</button></div>
+          <p class="myst-msg" id="myMsg" role="status" aria-live="polite"></p>
+          <a class="myst-wa" id="myWa" href="#" target="_blank" rel="noopener">Dúvidas sobre os selos? Fale no WhatsApp</a>
+        </form>
         <p class="loyal-note" id="loyalNote"></p>
       </div>
-      <div class="lcard" aria-hidden="true">
+      <div class="lcard" id="lcard" aria-hidden="true">
         <div class="lcard-top"><img src="img/logo-cream.png" alt="" width="810" height="284"><span>Cartão fidelidade</span></div>
         <div class="stamps" id="stamps"></div>
         <div class="lcard-bot"><span id="loyalGoal"></span><span class="num">(41) 9····-····</span></div>
@@ -962,7 +984,36 @@ const api=(op,id)=> LIKES_WORKER ? (op==="get" ? wGet().then(c=>c[id]||0) : fetc
   $("#fidHint").textContent = `${G} pedidos = ${prize}. Usamos seu número só para contar os selos.`;
   const PIZ='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 3.5 19.5A10 10 0 0 0 20.5 19.5Z"/><circle cx="11" cy="12" r="1.3" fill="currentColor"/><circle cx="14" cy="16" r="1.3" fill="currentColor"/><circle cx="9" cy="16.5" r="1.1" fill="currentColor"/></svg>';
   $("#stamps").innerHTML = Array.from({length:G},(_,i)=> i===G-1 ? `<span class="stamp free">pizza<br>grátis</span>` : i<3 ? `<span class="stamp on">${PIZ}</span>` : `<span class="stamp">${i+1}</span>`).join("");
-  $("#loyalAsk").href = waBase+"?text="+encodeURIComponent("Olá, Balcão! Quantos selos eu tenho no cartão fidelidade?");
+  const ask = waBase+"?text="+encodeURIComponent("Olá, Balcão! Quantos selos eu tenho no cartão fidelidade?");
+  $("#loyalAsk").href = ask;
+  if(!CONFIG.panelApi) return;
+  /* consulta de selos pelo próprio cliente (só com o painel ligado) */
+  $("#loyalAskWrap").hidden = true; $("#mySt").hidden = false; $("#myWa").href = ask;
+  $("#loyalNote").textContent = "Usamos o seu celular só para os pedidos e o cartão fidelidade. A consulta mostra apenas a quantidade de selos.";
+  try{ const t=localStorage.getItem("balcao-tel"); if(t) $("#myTel").value=t; }catch(e){}
+  const draw = n => {
+    $("#stamps").innerHTML = Array.from({length:G},(_,i)=> i<n ? `<span class="stamp on pop" style="animation-delay:${i*60}ms">${PIZ}</span>` : i===G-1 ? `<span class="stamp free">pizza<br>grátis</span>` : `<span class="stamp">${i+1}</span>`).join("");
+    $("#lcard").classList.add("real");
+  };
+  $("#mySt").addEventListener("submit", async e => {
+    e.preventDefault();
+    const msg=$("#myMsg"), tel=telDigits($("#myTel").value), btn=e.target.querySelector("button");
+    msg.className="myst-msg";
+    if(!tel){ msg.classList.add("err"); msg.textContent="Digite o celular com DDD, por exemplo (41) 99999-9999."; return $("#myTel").focus(); }
+    btn.disabled=true; msg.textContent="Consultando…";
+    try{
+      const r=await fetch(CONFIG.panelApi.replace(/\/$/,"")+"/selos?tel="+tel), j=await r.json().catch(()=>({}));
+      if(r.status===429) throw new Error("Muitas consultas seguidas. Tente de novo daqui a pouco.");
+      if(!r.ok) throw new Error("Não consegui consultar agora. Tente de novo ou fale no WhatsApp.");
+      try{ localStorage.setItem("balcao-tel",telPretty(tel)); }catch(x){}
+      draw(j.selos);
+      $(".lcard-bot .num").textContent = `(${tel.slice(0,2)}) ····-${tel.slice(-4)}`;
+      msg.innerHTML = j.completo ? `🎉 Cartão completo! <b>${prize}</b> te esperando. É só avisar no próximo pedido.`
+        : j.selos ? `Você tem <b>${j.selos} de ${G}</b> selos. Faltam <b>${G-j.selos}</b> para ${prize}.`
+        : `Ainda não há selos neste número. Marque o cartão fidelidade no seu próximo pedido!`;
+    }catch(err){ msg.classList.add("err"); msg.textContent=err.message; }
+    finally{ btn.disabled=false; }
+  });
 })();
 
 const hdr=$("header"); addEventListener("scroll",()=>hdr.classList.toggle("scrolled",scrollY>40),{passive:true});

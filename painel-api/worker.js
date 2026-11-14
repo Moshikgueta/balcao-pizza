@@ -4,8 +4,9 @@
  *
  * Público (só o site da Balcão, pelo navegador do cliente):
  *   POST /pedido                 registra o pedido enviado pelo site (o WhatsApp continua igual)
- *   (Não existe consulta pública de selos: assim ninguém descobre se um número é cliente.
- *    O cliente pergunta os selos pelo WhatsApp e a pizzaria vê no painel.)
+ *   GET  /selos?tel=41999999999  o cliente consulta o próprio cartão: devolve SÓ a quantidade de selos
+ *                                (nada de nome ou pedidos), só para o site da Balcão e no máximo
+ *                                MAX_CONSULTAS_POR_IP_HORA consultas por aparelho, para ninguém varrer números.
  *
  * Painel (exige a senha no cabeçalho  Authorization: Bearer SENHA):
  *   GET  /admin/pedidos?status=abertos|hoje|todos
@@ -39,6 +40,7 @@ const PRECOS = {                       // centavos — MANTENHA IGUAL ao MENU do
 const STATUS = ["novo", "preparo", "pronto", "retirado", "cancelado"];
 const ID_RE = /^B\d{4}-\d{4}-[A-Z0-9]{4}$/;
 const MAX_PEDIDOS_POR_IP_HORA = 12;
+const MAX_CONSULTAS_POR_IP_HORA = 10;
 
 /* ---------- utilidades ---------- */
 /** Origens aceitas: o site no GitHub Pages e o site na Cloudflare da MESMA conta
@@ -135,6 +137,18 @@ export async function handle(req, env) {
       VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`).bind(p.id, p.nome, p.tel, p.fid ? 1 : 0, JSON.stringify(p.itens), p.total,
       p.retirada, p.pagamento, p.obs, "novo", ip, agora()).run();
     return json(req, { ok: true, id: p.id });
+  }
+  if (req.method === "GET" && path === "/selos") {
+    if (!origens(req).includes(req.headers.get("Origin") || "")) return json(req, { error: "origem" }, 403);
+    const tel = normTel(url.searchParams.get("tel"));
+    if (!tel) return json(req, { error: "celular inválido" }, 400);
+    const ip = await hashIp(req), desde = new Date(Date.now() - 3600e3).toISOString();
+    const n = await env.DB.prepare("SELECT COUNT(*) AS n FROM consultas WHERE ip = ? AND criado_em > ?").bind(ip, desde).first();
+    if (n && n.n >= MAX_CONSULTAS_POR_IP_HORA) return json(req, { error: "muitas consultas" }, 429);
+    await env.DB.prepare("INSERT INTO consultas (ip, criado_em) VALUES (?, ?)").bind(ip, agora()).run();
+    await env.DB.prepare("DELETE FROM consultas WHERE criado_em < ?").bind(new Date(Date.now() - 86400e3).toISOString()).run();
+    const total = await selosDe(env, tel);
+    return json(req, { selos: Math.min(total, META_SELOS), meta: META_SELOS, completo: total >= META_SELOS });
   }
   if (req.method === "GET" && path === "/") return json(req, { ok: true, api: "painel-balcao" });
 

@@ -27,3 +27,10 @@ CREATE TABLE IF NOT EXISTS selos (
   criado_em  TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS selos_tel ON selos (tel);
+
+-- Consultas de selos feitas pelos clientes no site (só para limitar abuso; apagadas depois de 1 dia).
+CREATE TABLE IF NOT EXISTS consultas (
+  ip        TEXT NOT NULL,
+  criado_em TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS consultas_ip ON consultas (ip, criado_em);
