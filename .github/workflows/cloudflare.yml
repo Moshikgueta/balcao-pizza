@@ -66,7 +66,9 @@ jobs:
         run: |
           mkdir dist
           tar --exclude=./.git --exclude=./.github --exclude=./dist --exclude='./*-api' --exclude='*.md' \
-              --exclude=./wrangler.toml --exclude=node_modules --exclude='./_e2e*' -cf - . | tar -xf - -C dist
+              --exclude=./wrangler.toml --exclude=node_modules --exclude='./_e2e*' --exclude=./.wrangler --exclude='*.log' \
+              -cf - . | tar -xf - -C dist
+          if [ -e dist/.wrangler ] || ls dist/*.log >/dev/null 2>&1; then echo "::error::Arquivo interno entrou no site."; exit 1; fi
           sed -i "s#panelApi: \"\",#panelApi: \"$PANEL_URL\",#" dist/index.html
           sed -i "s#const API_PADRAO = \"\";#const API_PADRAO = \"$PANEL_URL\";#" dist/painel/index.html
           grep -q "panelApi: \"$PANEL_URL\"" dist/index.html || { echo "::error::Não consegui ligar o site ao painel."; exit 1; }
@@ -77,6 +79,7 @@ jobs:
           [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || unset CLOUDFLARE_ACCOUNT_ID
           $WRANGLER deploy | tee site.log
           SITE_URL=$(grep -oE 'https://balcao-pizza\.[a-z0-9-]+\.workers\.dev' site.log | head -1)
+          echo "SITE_URL=$SITE_URL" >> "$GITHUB_ENV"
           {
             echo "## Publicado na Cloudflare"
             echo "- Site: $SITE_URL"
@@ -84,3 +87,17 @@ jobs:
             echo "- Servidor do painel: $PANEL_URL"
             [ -n "$ADMIN_KEY" ] || echo "- ⚠️ Falta a senha do painel: crie o segredo ADMIN_KEY no repositório ou no Worker painel-balcao (Settings → Variables and Secrets)."
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Conferir no ar
+        run: |
+          sleep 5
+          curl -fsS "$PANEL_URL/" | grep -q '"api":"painel-balcao"' && echo "servidor do painel ok"
+          curl -fsS "$SITE_URL/" | grep -q "panelApi: \"$PANEL_URL\"" && echo "site ligado ao painel ok"
+          curl -fsS "$SITE_URL/painel/" | grep -q "API_PADRAO = \"$PANEL_URL\"" && echo "painel ok"
+          for f in painel.log .wrangler/cache/wrangler-account.json painel-api/worker.js wrangler.toml; do
+            c=$(curl -s -o /dev/null -w "%{http_code}" "$SITE_URL/$f")
+            if [ "$c" = "200" ]; then echo "::error::$f está público"; exit 1; fi
+          done
+          echo "arquivos internos fora do ar ok"
+          c=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$PANEL_URL/pedido" -H "Origin: $SITE_URL" -H "Content-Type: application/json" -d '{}')
+          [ "$c" = "400" ] && echo "servidor aceita o site e recusa pedido vazio ok" || { echo "::error::resposta inesperada do servidor: $c"; exit 1; }
