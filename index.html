@@ -387,7 +387,7 @@ footer a{text-decoration:none}
       <div class="menu">
         <aside class="stage" id="stage" aria-label="Pizza selecionada">
           <button class="sheet-close" type="button" data-close-stage aria-label="Fechar">×</button>
-          <div class="plate"><div class="flour" id="flour" aria-hidden="true"></div><img id="stageImg" src="img/lg/margherita.jpg" alt="" width="901" height="901"><span class="size">30 cm · 6 pedaços</span></div>
+          <div class="plate"><div class="flour" id="flour" aria-hidden="true" hidden></div><img id="stageImg" src="img/lg/margherita.jpg" alt="" width="901" height="901"><span class="size">30 cm · 6 pedaços</span></div>
           <div class="tags" id="stageTags"></div>
           <div class="stage-head"><h3 id="stageName">Margherita</h3><span class="price" id="stagePrice"></span></div>
           <p class="desc" id="stageDesc"></p>
@@ -624,7 +624,7 @@ list.innerHTML = MENU.map((p,i)=>`
 
 /* ---------- cardápio cinematográfico: pizza caindo no prato, com farinha ---------- */
 const flourEl = $("#flour"), FL = [];
-for(let k=0;k<(innerWidth<700?10:16);k++){ const i=document.createElement("i"); i.style.setProperty("--s",(2+Math.random()*4)+"px"); i.style.left=(Math.random()*100)+"%"; flourEl.appendChild(i);
+for(let k=0;k<0;k++){ // queijo caindo desligado a pedido do cliente const i=document.createElement("i"); i.style.setProperty("--s",(2+Math.random()*4)+"px"); i.style.left=(Math.random()*100)+"%"; flourEl.appendChild(i);
   FL.push({i,dl:Math.random()*.25,sp:.6+Math.random()*.8,sw:(Math.random()-.5)*40}); }
 function flourBurst(){ if(reduce||!flourEl.animate) return;
   FL.forEach(d=>d.i.animate([{transform:"translate(0,0)",opacity:0},{opacity:.9,offset:.15},{transform:`translate(${d.sw}px,${flourEl.clientHeight*(.75+d.sp*.2)}px)`,opacity:0}],
